@@ -128,7 +128,7 @@ impl eframe::App for ReplayManager {
 
         egui::CentralPanel::default().show(ctx, |ui| {
             // The central panel the region left after adding TopPanel's and SidePanel's
-            ui.heading("Medal but COOLER and BETTER");
+            ui.heading("Replay Manager");
 
             ui.horizontal(|ui| {
                 ui.label(format!("Replays in {}", self.replay_folder.display()));
