@@ -40,7 +40,6 @@ cargo install --path .
 ```
 
 ## Roadmap
-- Use `serde` to save app state (sorting, etc) when closing the app
 - Catbox authentication with user token
 - Better search bar (make full screen width)
 - Add settings for the replay folders and stuff
