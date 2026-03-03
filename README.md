@@ -6,6 +6,20 @@ It can go in a folder you specify, and will list all the files with a specific f
 
 <img width="810" height="725" alt="image" src="https://github.com/user-attachments/assets/965d7eb0-e76f-4ca7-a75b-a3e948229db5" />
 
+## Project Structure
+```
+/
+src
+|_ .github/workflows - github rust tests
+|_ app.rs - the egui app
+|_ main.rs - the main rust code that just launches the egui app
+|_ thumbnails.rs - generates thumbnails
+|_ videoutils - simple functions that return info on a file when given a pathbuf
+README.md - this file
+LICENSE - license (gplv3)
+Cargo.lock - idk
+Cargo.toml - Cargo dependencies
+```
 
 ## How to install
 ```bash
@@ -37,16 +51,4 @@ cargo install --path .
 - More contrast between the top bar with the search bar and the ScrollView
 - Actual multithreading (Open apps on another thread since egui is immediatemode)
 
-## Project Organization
-```
-/
-src
-|_ app.rs - the egui app
-|_ main.rs - the main rust code that just launches the egui app
-|_ thumbnails.rs - generates thumbnails
-|_ videoutils - simple functions that return info on a file when given a pathbuf
-README.md - this file
-LICENSE - license (gplv3)
-Cargo.lock - idk
-Cargo.toml - Cargo dependencies
-```
+
