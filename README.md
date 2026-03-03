@@ -41,7 +41,7 @@ src
 |_ thumbnails.rs - generates thumbnails
 |_ videoutils - simple functions that return info on a file when given a pathbuf
 README.md - this file
-LICENSE - license (gplv2)
+LICENSE - license (gplv3)
 Cargo.lock - idk
 Cargo.toml - Cargo dependencies
 ```
