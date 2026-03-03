@@ -258,16 +258,30 @@ impl eframe::App for ReplayManager {
                                 let button_response = ui.add(button);
                                 button_response.context_menu(|ui| {
                                     if ui.button("Edit").clicked() {
-                                        let _ = Command::new("losslesscut")
-                                            .arg(format!("{}", entry.display()))
-                                            .output()
-                                            .expect("Failed to open losslesscut");
+                                        let entry_path = format!("{}", entry.display());
+                                        let _ = std::thread::spawn(move || {
+                                            let rt = tokio::runtime::Runtime::new().unwrap();
+
+                                            let _ = rt.spawn_blocking(|| {
+                                                let _ = Command::new("losslesscut")
+                                                    .arg(entry_path)
+                                                    .output()
+                                                    .expect("Failed to open losslesscut");
+                                            });
+                                        });
                                     }
                                     if ui.button("View").clicked() {
-                                        let _ = Command::new("xdg-open")
-                                            .arg(format!("{}", entry.display()))
-                                            .output()
-                                            .expect("Failed to open video viewer");
+                                        let entry_path = format!("{}", entry.display());
+                                        let _ = std::thread::spawn(move || {
+                                            let rt = tokio::runtime::Runtime::new().unwrap();
+
+                                            let _ = rt.spawn_blocking(|| {
+                                                let _ = Command::new("xdg-open")
+                                                    .arg(entry_path)
+                                                    .output()
+                                                    .expect("Failed to open media viewer");
+                                            });
+                                        });
                                     }
                                     if ui.button("Delete").clicked() {
                                         self.delete_popup = Some(i);
@@ -293,10 +307,17 @@ impl eframe::App for ReplayManager {
                                     }
                                 });
                                 if button_response.double_clicked() {
-                                    let _ = Command::new("xdg-open")
-                                        .arg(format!("{}", entry.display()))
-                                        .output()
-                                        .expect("Failed to open video viewer");
+                                    let entry_path = format!("{}", entry.display());
+                                    let _ = std::thread::spawn(move || {
+                                        let rt = tokio::runtime::Runtime::new().unwrap();
+
+                                        let _ = rt.spawn_blocking(|| {
+                                            let _ = Command::new("xdg-open")
+                                                .arg(entry_path)
+                                                .output()
+                                                .expect("Failed to open media viewer");
+                                        });
+                                    });
                                 }
 
                                 if button_response.clicked() {
