@@ -3,8 +3,8 @@ use crate::videoutils;
 use anyhow::Result;
 use catbox;
 use eframe::egui::{self, Color32};
+use egui_infinite_scroll;
 use glob::glob;
-use rayon;
 use std::sync::mpsc;
 use std::{path::PathBuf, process::Command};
 
@@ -211,6 +211,7 @@ impl eframe::App for ReplayManager {
             ui.style_mut().visuals.widgets.hovered.weak_bg_fill = Color32::DARK_GRAY;
             ui.style_mut().visuals.widgets.active.weak_bg_fill = Color32::LIGHT_BLUE;
 
+            // let replay_grid =
             let replay_grid = egui::Grid::new("Replays")
                 .min_col_width(320.0)
                 .min_row_height(240.0);
@@ -218,15 +219,13 @@ impl eframe::App for ReplayManager {
             egui::ScrollArea::both().show(ui, |ui| {
                 replay_grid.show(ui, |ui| -> Result<()> {
                     for (i, entry) in replay_enumerate {
-                        let thumbnail_path = rayon::scope(|_| {
-                            return thumbnails::create(
-                                &entry,
-                                &format!("{}", self.replay_folder.display()),
-                                true,
-                                0.0,
-                            )
-                            .expect("Failed to get thumbnail");
-                        });
+                        let thumbnail_path = thumbnails::create(
+                            &entry,
+                            &format!("{}", self.replay_folder.display()),
+                            true,
+                            0.0,
+                        )
+                        .expect("Failed to get thumbnail");
                         let thumbnail_image =
                             egui::Image::from_uri(format!("file://{}", thumbnail_path.display()))
                                 .fit_to_exact_size(egui::Vec2::new(300.0, 225.0)) // original res 640x480
