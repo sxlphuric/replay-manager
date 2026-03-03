@@ -51,6 +51,7 @@ cargo install --path .
 - Make it so you can click or copy the link on the Catbox popup
 - Implement a way to choose how to send files to Catbox and Add settings that allow you to choose which Catbox options (litter or normal, time, fallback to litter when file to big or not)
 - Use the thumbnail or something crate/ ez-ffmpeg when ffmpeg-next is fixed (IF POSSIBLE)
+- Possibly rewrite gpu-screen-recorder in rust :3
 - Fix result error handling (It's absolutely horrible how expect is everywhere)
 - Fix light mode
 - More contrast between the top bar with the search bar and the ScrollView
