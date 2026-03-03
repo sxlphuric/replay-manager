@@ -55,3 +55,4 @@ cargo install --path .
 - Fix light mode
 - More contrast between the top bar with the search bar and the ScrollView
 - Add side panel for catbox file send operations
+- Optimize, the app seems to use alot of cpu while multithreading
