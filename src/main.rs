@@ -43,6 +43,7 @@ mod tests {
         let file = PathBuf::from("app.rs");
         assert_eq!("app".to_string(), videoutils::get_name(&file));
     }
+    // [TODO] Find a way to get these tests to work
     #[test]
     fn can_get_mod_date() {
         let file = PathBuf::from("app.rs");
