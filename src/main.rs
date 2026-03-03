@@ -27,3 +27,38 @@ fn main() -> eframe::Result {
         }),
     )
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{thumbnails, videoutils};
+    use std::path::PathBuf;
+    #[test]
+    fn can_create_thumbnail() {
+        let thumbnail =
+            thumbnails::create(&PathBuf::from("../test/bounce.webm"), "test", false, 0.1);
+        assert!(thumbnail.expect("Thumbnail not loaded").exists());
+    }
+    #[test]
+    fn can_get_name() {
+        let file = PathBuf::from("app.rs");
+        assert_eq!("app".to_string(), videoutils::get_name(&file));
+    }
+    #[test]
+    fn can_get_mod_date() {
+        let file = PathBuf::from("app.rs");
+        //assert_eq!("app".to_string(), videoutils::get_name(&file));
+        unimplemented!()
+    }
+    #[test]
+    fn can_get_creation_date() {
+        let file = PathBuf::from("app.rs");
+        //assert_eq!("app".to_string(), videoutils::get_name(&file));
+        unimplemented!()
+    }
+    #[test]
+    fn can_get_size() {
+        let file = PathBuf::from("../LICENSE");
+        // assert_eq!("app".to_string(), videoutils::get_size(&file));
+        unimplemented!();
+    }
+}
