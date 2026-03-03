@@ -9,7 +9,8 @@ It can go in a folder you specify, and will list all the files with a specific f
 ## Project Structure
 ```
 /
-.github/workflows - github rust tests
+.github/workflows - workflows
+|_ rust.yml - workflow for Cargo tests
 test - files for test workflows
 |_ bounce.webm - test video for thumbnail test
 src
