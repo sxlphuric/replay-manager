@@ -6,12 +6,9 @@ use eframe::egui::{self, Color32};
 use glob::glob;
 use rayon;
 use std::sync::mpsc;
-use std::{
-    path::{Path, PathBuf},
-    process::Command,
-};
+use std::{path::PathBuf, process::Command};
 
-#[derive(PartialEq)]
+#[derive(PartialEq, serde::Deserialize, serde::Serialize)]
 enum Sorting {
     CreationDate,
     ModificationDate,
@@ -19,7 +16,7 @@ enum Sorting {
     Size,
 }
 
-#[derive(Default)]
+#[derive(Default, serde::Deserialize, serde::Serialize)]
 enum CatboxUploadState {
     #[default]
     Idle,
@@ -28,19 +25,29 @@ enum CatboxUploadState {
     Error(String),
 }
 
+#[derive(serde::Deserialize, serde::Serialize)]
+#[serde(default)]
 pub struct ReplayManager {
-    replay_folder: &'static Path,
-    replay_format: &'static str,
-    replay_prefix: &'static str,
+    replay_folder: PathBuf,
+    replay_format: String,
+    replay_prefix: String,
+
+    #[serde(skip)]
     delete_popup: Option<usize>,
     catbox_popup: Option<usize>,
     replays: Vec<PathBuf>,
+
+    #[serde(skip)]
     loading_done: bool,
     sort_order: Sorting,
     ascending: bool,
+
+    #[serde(skip)]
     search_query: String,
     catbox_upload_state: CatboxUploadState,
+    #[serde(skip)]
     catbox_upload_recv: mpsc::Receiver<Result<String, String>>,
+    #[serde(skip)]
     catbox_upload_send: mpsc::Sender<Result<String, String>>,
 }
 
@@ -48,9 +55,9 @@ impl Default for ReplayManager {
     fn default() -> Self {
         let (tx, rx) = mpsc::channel();
         Self {
-            replay_folder: Path::new("/home/aredfx/Videos/Replays"),
-            replay_format: "mp4",
-            replay_prefix: "Replay_",
+            replay_folder: PathBuf::from("/home/aredfx/Videos/Replays"),
+            replay_format: "mp4".to_string(),
+            replay_prefix: "Replay_".to_string(),
             delete_popup: None,
             catbox_popup: None,
             replays: vec![],
@@ -67,17 +74,24 @@ impl Default for ReplayManager {
 
 impl ReplayManager {
     /// Called once before the first frame.
-    pub fn new(_cc: &eframe::CreationContext<'_>) -> Self {
+    pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         // This is also where you can customize the look and feel of egui using
         // `cc.egui_ctx.set_visuals` and `cc.egui_ctx.set_fonts`.
 
         // Load previous app state (if any).
         // Note that you must enable the `persistence` feature for this to work.
-        Default::default()
+        if let Some(storage) = cc.storage {
+            eframe::get_value(storage, eframe::APP_KEY).unwrap_or_default()
+        } else {
+            Default::default()
+        }
     }
 }
 
 impl eframe::App for ReplayManager {
+    fn save(&mut self, storage: &mut dyn eframe::Storage) {
+        eframe::set_value(storage, eframe::APP_KEY, self);
+    }
     /// Called each time the UI needs repainting, which may be many times per second.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         // Put your widgets into a `SidePanel`, `TopBottomPanel`, `CentralPanel`, `Window` or `Area`.
