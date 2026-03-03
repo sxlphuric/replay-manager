@@ -54,5 +54,4 @@ cargo install --path .
 - Fix result error handling (It's absolutely horrible how expect is everywhere)
 - Fix light mode
 - More contrast between the top bar with the search bar and the ScrollView
-- Actual multithreading (Open apps on another thread since egui is immediatemode)
 - Add side panel for catbox file send operations
