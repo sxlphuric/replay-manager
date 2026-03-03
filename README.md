@@ -34,6 +34,7 @@ cargo install --path .
 - Make it so you can click or copy the link on the Catbox popup
 - Fix result error handling (It's absolutely horrible how expect is everywhere)
 - Fix light mode
+- More contrast between the top bar with the search bar and the ScrollView
 
 ## Project Organization
 ```
