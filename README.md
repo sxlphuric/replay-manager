@@ -3,7 +3,7 @@ This is the Replay Manager.
 It can go in a folder you specify, and will list all the files with a specific file extension. It even creates thumbnails for them with the custom thumbnail script. Furthermore, you can share files to Catbox (litter) and open videos in the Losslesscut video editor.
 
 ## How to install
-```
+```bash
 # Install dependencies
 yay -S losslesscut
 
@@ -39,6 +39,7 @@ src
 |_ thumbnails.rs - generates thumbnails
 |_ videoutils - simple functions that return info on a file when given a pathbuf
 README.md - this file
+LICENSE - license (gplv2)
 Cargo.lock - idk
 Cargo.toml - Cargo dependencies
 ```
