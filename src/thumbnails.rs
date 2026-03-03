@@ -3,7 +3,12 @@ use std::path::PathBuf;
 use std::process::Command;
 
 #[allow(dead_code)]
-pub fn create<'a>(videopath: &PathBuf, folder: &'a str, check_exists: bool) -> Result<PathBuf> {
+pub fn create<'a>(
+    videopath: &PathBuf,
+    folder: &'a str,
+    check_exists: bool,
+    thumbnail_time: f64,
+) -> Result<PathBuf> {
     let thumbnail_path = PathBuf::from(&format!(
         "{}/.thumbnails/Thumbnail_{}.png",
         folder,
@@ -24,7 +29,7 @@ pub fn create<'a>(videopath: &PathBuf, folder: &'a str, check_exists: bool) -> R
         .arg("-strict")
         .arg("experimental")
         .arg("-ss")
-        .arg("5.0")
+        .arg(thumbnail_time.to_string())
         .arg("-i")
         .arg(format!("{}", &videopath.display()))
         .arg("-frames:v")

@@ -209,6 +209,7 @@ impl eframe::App for ReplayManager {
                                 &entry,
                                 &format!("{}", self.replay_folder.display()),
                                 true,
+                                2.5,
                             )
                             .expect("Failed to get thumbnail");
                         });
