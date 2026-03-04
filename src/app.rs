@@ -198,6 +198,8 @@ impl eframe::App for ReplayManager {
                 self.replay_format
             ));
 
+            if replays_glob.
+
             self.replays = replays_glob
                 .expect("Could not get replays &Paths iterator")
                 .filter_map(|e| e.ok())
