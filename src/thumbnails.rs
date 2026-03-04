@@ -10,7 +10,7 @@ pub fn create<'a>(
     thumbnail_time: f64,
 ) -> Result<PathBuf> {
     let video_name = &videopath.file_stem();
-    let mut thumbnail_path = PathBuf::new();
+    let thumbnail_path: PathBuf;
     if video_name.is_some() {
         thumbnail_path = PathBuf::from(&format!(
             "{}/.thumbnails/Thumbnail_{}.png",
