@@ -9,14 +9,17 @@ pub fn create<'a>(
     check_exists: bool,
     thumbnail_time: f64,
 ) -> Result<PathBuf> {
-    let thumbnail_path = PathBuf::from(&format!(
-        "{}/.thumbnails/Thumbnail_{}.png",
-        folder,
-        &videopath
-            .file_stem()
-            .expect("Could not find file name")
-            .to_string_lossy()
-    ));
+    let video_name = &videopath.file_stem();
+    let mut thumbnail_path = PathBuf::new();
+    if video_name.is_some() {
+        thumbnail_path = PathBuf::from(&format!(
+            "{}/.thumbnails/Thumbnail_{}.png",
+            folder,
+            video_name.unwrap().to_string_lossy()
+        ));
+    } else {
+        return Err(anyhow!(format!("{:?}", video_name)));
+    }
     if check_exists {
         if thumbnail_path.exists() {
             return Ok(thumbnail_path);
