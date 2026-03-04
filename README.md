@@ -58,6 +58,7 @@ cargo install --path .
 - Add icon
 - Working tests
 - Fix the inputs in settings not being aligned
+- Use a toast instead of a scary modal to show errors
 ## Roadmap
 - [] Fix light mode
 - [] Optimize
