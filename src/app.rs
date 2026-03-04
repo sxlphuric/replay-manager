@@ -103,11 +103,11 @@ impl ReplayManager {
 
         // Load previous app state (if any).
         // Note that you must enable the `persistence` feature for this to work.
-        /*if let Some(storage) = cc.storage {
+        if let Some(storage) = cc.storage {
             eframe::get_value(storage, eframe::APP_KEY).unwrap_or_default()
-        } else {*/
+        } else {
         Default::default()
-        //}
+        }
     }
 }
 
@@ -508,7 +508,8 @@ impl eframe::App for ReplayManager {
 
                                                 ui.colored_label(
                                                     Color32::RED,
-                                                    "Lowkey dont know what happened",
+                                                    // [TODO] Implement error message display
+                                                    "Error",
                                                 );
 
                                                 ui.horizontal(|ui| {
