@@ -593,18 +593,27 @@ impl eframe::App for ReplayManager {
                                                         ui.horizontal(|ui| {
                                                             ui.spinner();
                                                         });
+                                                        if ui.button("Close").clicked() {
+                                                                                                               self.catbox_popup = None;
+                                                                                                           }
                                                     }
                                                     &CatboxUploadState::Uploading => {
                                                         ui.horizontal(|ui| {
                                                             ui.spinner();
                                                             ui.label("Sending file to Catbox");
                                                         });
+                                                        if ui.button("Cancel").clicked() {
+                                                                                                               self.catbox_popup = None;
+                                                                                                           }
                                                     }
                                                     CatboxUploadState::Error(error) => {
                                                         ui.colored_label(
                                                             Color32::RED,
                                                             format!("Error: {}", error),
                                                         );
+                                                        if ui.button("Cancel").clicked() {
+                                                                                                               self.catbox_popup = None;
+                                                                                                           }
                                                     }
                                                     CatboxUploadState::Done(link) => {
                                                         ui.label("Upload finished!");
@@ -622,14 +631,12 @@ impl eframe::App for ReplayManager {
                                                                 ui.ctx().copy_text(link.clone());
                                                             }
                                                         });
+                                                        if ui.button("Ok").clicked() {
+                                                                                                               self.catbox_popup = None;
+                                                                                                           }
                                                     }
                                                 }
-                                                ui.horizontal(|ui| {
-                                                    if ui.button("Ok").clicked() {
-                                                        self.catbox_popup = None;
-                                                    }
-                                                });
-                                            },
+                                                                                               },
                                         );
                                     }
                                     if self.error.is_some() {
