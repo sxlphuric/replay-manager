@@ -18,7 +18,11 @@ pub fn create<'a>(
             video_name.unwrap().to_string_lossy()
         ));
     } else {
-        return Err(anyhow!(format!("{:?}", video_name)));
+        return Err(anyhow!(format!("Video name is empty")));
+    }
+    let thumbnail_dir = thumbnail_path.parent().unwrap();
+    if !thumbnail_dir.exists() {
+        std::fs::create_dir_all(thumbnail_dir)?;
     }
     if check_exists {
         if thumbnail_path.exists() {
