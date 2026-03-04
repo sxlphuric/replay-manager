@@ -353,14 +353,11 @@ impl eframe::App for ReplayManager {
                                         button_response.context_menu(|ui| {
                                             if ui.button("Edit").clicked() {
                                                 let entry_path = format!("{}", entry.display());
-                                                match Command::new("xdg-open")
-                                                    .arg(&entry_path)
-                                                    .spawn()
-                                                {
+                                                match open::with(&entry_path, "losslesscut") {
                                                     Ok(_) => {}
                                                     Err(_) => {
                                                         self.error = Some(Err(anyhow!(format!(
-                                                            "Failed to open file: {}",
+                                                            "Failed to open Losslesscut: {}",
                                                             &entry_path
                                                         ))))
                                                     }
@@ -368,10 +365,7 @@ impl eframe::App for ReplayManager {
                                             }
                                             if ui.button("View").clicked() {
                                                 let entry_path = format!("{}", entry.display());
-                                                match Command::new("xdg-open")
-                                                    .arg(&entry_path)
-                                                    .spawn()
-                                                {
+                                                match open::that(&entry_path) {
                                                     Ok(_) => {}
                                                     Err(_) => {
                                                         self.error = Some(Err(anyhow!(format!(
@@ -409,8 +403,7 @@ impl eframe::App for ReplayManager {
                                         });
                                         if button_response.double_clicked() {
                                             let entry_path = format!("{}", entry.display());
-                                            match Command::new("xdg-open").arg(&entry_path).spawn()
-                                            {
+                                            match open::that(&entry_path) {
                                                 Ok(_) => {}
                                                 Err(_) => {
                                                     self.error = Some(Err(anyhow!(format!(
@@ -500,6 +493,27 @@ impl eframe::App for ReplayManager {
                                                 ui.horizontal(|ui| {
                                                     if ui.button("Ok").clicked() {
                                                         self.catbox_popup = None;
+                                                    }
+                                                });
+                                            },
+                                        );
+                                    }
+                                    if self.error.is_some() {
+                                        egui::Modal::new(egui::Id::new(i)).show(
+                                            ctx,
+                                            |ui: &mut egui::Ui| {
+                                                ui.set_min_width(310.0);
+
+                                                ui.heading("Error");
+
+                                                ui.colored_label(
+                                                    Color32::RED,
+                                                    "Lowkey dont know what happened",
+                                                );
+
+                                                ui.horizontal(|ui| {
+                                                    if ui.button("Ok").clicked() {
+                                                        self.error = None;
                                                     }
                                                 });
                                             },
