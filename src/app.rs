@@ -1,6 +1,8 @@
 use crate::thumbnails;
 use crate::videoutils;
+use anyhow::Error;
 use anyhow::Result;
+use anyhow::anyhow;
 use catbox;
 use eframe::egui::{self, Color32};
 use egui_infinite_scroll::InfiniteScroll;
@@ -54,6 +56,10 @@ pub struct ReplayManager {
     infinite_scroll: egui_infinite_scroll::InfiniteScroll<i32, i32>,
     #[serde(skip)]
     settings_popup: bool,
+    #[serde(skip)]
+    error_modal: bool,
+    #[serde(skip)]
+    error: Option<Result<(), Error>>,
 }
 
 impl Default for ReplayManager {
@@ -66,6 +72,7 @@ impl Default for ReplayManager {
             replay_prefix: "Replay_".to_string(),
             delete_popup: None,
             catbox_popup: None,
+            error_modal: false,
             replays: vec![],
             loading_done: false,
             sort_order: Sorting::CreationDate,
@@ -80,6 +87,7 @@ impl Default for ReplayManager {
                 callback(Ok(((start..end).collect(), Some(end))))
             }),
             settings_popup: false,
+            error: None,
         }
     }
 }
@@ -198,12 +206,11 @@ impl eframe::App for ReplayManager {
                 self.replay_format
             ));
 
-            if replays_glob.
-
-            self.replays = replays_glob
-                .expect("Could not get replays &Paths iterator")
-                .filter_map(|e| e.ok())
-                .collect();
+            if replays_glob.is_ok() {
+                self.replays = replays_glob.unwrap().filter_map(|e| e.ok()).collect();
+            } else {
+                self.error = Some(Err(anyhow!(format!("{}", replays_glob.unwrap_err()))))
+            }
 
             self.replays.sort_by(|a, b| a.cmp(&b));
 
@@ -271,13 +278,23 @@ impl eframe::App for ReplayManager {
                     ui.vertical_centered_justified(|ui| {
                         replay_grid.show(ui, |ui| -> Result<()> {
                             for (i, entry) in replay_enumerate {
-                                let thumbnail_path = thumbnails::create(
+                                let thumbnail_path_result = thumbnails::create(
                                     &entry,
                                     &format!("{}", self.replay_folder.display()),
                                     true,
                                     0.0,
-                                )
-                                .expect("Failed to get thumbnail");
+                                );
+                                let mut thumbnail_path = PathBuf::new();
+                                if thumbnail_path_result.is_ok() {
+                                    thumbnail_path = thumbnail_path_result.unwrap()
+                                } else {
+                                    self.error = Some(Err(anyhow!(format!(
+                                        "{}",
+                                        thumbnail_path_result.unwrap_err()
+                                    ))));
+                                    self.error_modal = true;
+                                }
+
                                 let thumbnail_image = egui::Image::from_uri(format!(
                                     "file://{}",
                                     thumbnail_path.display()
@@ -285,25 +302,25 @@ impl eframe::App for ReplayManager {
                                 .fit_to_exact_size(image_size) // original res 640x480
                                 .corner_radius(5);
 
-                                if format!(
-                                    "{}",
-                                    entry
-                                        .file_stem()
-                                        .expect("Could not get file stem")
-                                        .to_string_lossy()
-                                )
-                                .to_lowercase()
-                                .contains(&self.search_query.to_lowercase())
+                                let file_stem_opt = entry.file_stem();
+                                let file_stem: &std::ffi::OsStr;
+                                if file_stem_opt.is_some() {
+                                    file_stem = file_stem_opt.unwrap();
+                                } else {
+                                    self.error = Some(Err(anyhow!(format!("{:?}", file_stem_opt))));
+                                    self.error_modal = true;
+                                }
+
+                                if format!("{}", file_stem.to_string_lossy())
+                                    .to_lowercase()
+                                    .contains(&self.search_query.to_lowercase())
                                 {
                                     let button = egui::Button::image(thumbnail_image)
                                         .min_size(image_size)
                                         .frame_when_inactive(false);
                                     let label = egui::Label::new(format!(
                                         "{}",
-                                        &entry
-                                            .file_name()
-                                            .expect("Could not use file name")
-                                            .to_string_lossy(),
+                                        file_stem.to_string_lossy(),
                                     ))
                                     .halign(egui::Align::Center);
 
@@ -317,10 +334,41 @@ impl eframe::App for ReplayManager {
                                                         tokio::runtime::Runtime::new().unwrap();
 
                                                     let _ = rt.spawn_blocking(|| {
-                                                        let _ = Command::new("losslesscut")
-                                                            .arg(entry_path)
-                                                            .output()
-                                                            .expect("Failed to open losslesscut");
+                                                        let command_output =
+                                                            Command::new("losslesscut")
+                                                                .arg(entry_path)
+                                                                .output();
+                                                        if command_output.is_ok() {
+                                                            let command_output_unwrap =
+                                                                command_output.unwrap();
+                                                            if !command_output_unwrap
+                                                                .status
+                                                                .success()
+                                                            {
+                                                                let error_message =
+                                                                    String::from_utf8(
+                                                                        command_output_unwrap
+                                                                            .stderr,
+                                                                    );
+                                                                if error_message.is_ok() {
+                                                                    self.error =
+                                                                        Some(Err(anyhow!(
+                                                                            error_message.unwrap()
+                                                                        )));
+                                                                } else {
+                                                                    self.error = Some(Err(anyhow!(
+                                                                        error_message.unwrap_err()
+                                                                    )))
+                                                                }
+                                                            }
+                                                        } else {
+                                                            self.error =
+                                                                Some(Err(anyhow!(format!(
+                                                                    "{}",
+                                                                    command_output.unwrap_err()
+                                                                ))));
+                                                            self.error_modal = true;
+                                                        }
                                                     });
                                                 });
                                             }
@@ -331,10 +379,41 @@ impl eframe::App for ReplayManager {
                                                         tokio::runtime::Runtime::new().unwrap();
 
                                                     let _ = rt.spawn_blocking(|| {
-                                                        let _ = Command::new("xdg-open")
-                                                            .arg(entry_path)
-                                                            .output()
-                                                            .expect("Failed to open media viewer");
+                                                        let command_output =
+                                                            Command::new("xdg-open")
+                                                                .arg(entry_path)
+                                                                .output();
+                                                        if command_output.is_ok() {
+                                                            let command_output_unwrap =
+                                                                command_output.unwrap();
+                                                            if !command_output_unwrap
+                                                                .status
+                                                                .success()
+                                                            {
+                                                                let error_message =
+                                                                    String::from_utf8(
+                                                                        command_output_unwrap
+                                                                            .stderr,
+                                                                    );
+                                                                if error_message.is_ok() {
+                                                                    self.error =
+                                                                        Some(Err(anyhow!(
+                                                                            error_message.unwrap()
+                                                                        )));
+                                                                } else {
+                                                                    self.error = Some(Err(anyhow!(
+                                                                        error_message.unwrap_err()
+                                                                    )))
+                                                                }
+                                                            }
+                                                        } else {
+                                                            self.error =
+                                                                Some(Err(anyhow!(format!(
+                                                                    "{}",
+                                                                    command_output.unwrap_err()
+                                                                ))));
+                                                            self.error_modal = true;
+                                                        }
                                                     });
                                                 });
                                             }
@@ -370,10 +449,33 @@ impl eframe::App for ReplayManager {
                                                 let rt = tokio::runtime::Runtime::new().unwrap();
 
                                                 let _ = rt.spawn_blocking(|| {
-                                                    let _ = Command::new("xdg-open")
+                                                    let command_output = Command::new("xdg-open")
                                                         .arg(entry_path)
-                                                        .output()
-                                                        .expect("Failed to open media viewer");
+                                                        .output();
+                                                    if command_output.is_ok() {
+                                                        let command_output_unwrap =
+                                                            command_output.unwrap();
+                                                        if !command_output_unwrap.status.success() {
+                                                            let error_message = String::from_utf8(
+                                                                command_output_unwrap.stderr,
+                                                            );
+                                                            if error_message.is_ok() {
+                                                                self.error = Some(Err(anyhow!(
+                                                                    error_message.unwrap()
+                                                                )));
+                                                            } else {
+                                                                self.error = Some(Err(anyhow!(
+                                                                    error_message.unwrap_err()
+                                                                )))
+                                                            }
+                                                        }
+                                                    } else {
+                                                        self.error = Some(Err(anyhow!(format!(
+                                                            "{}",
+                                                            command_output.unwrap_err()
+                                                        ))));
+                                                        self.error_modal = true;
+                                                    }
                                                 });
                                             });
                                         }
