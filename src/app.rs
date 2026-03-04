@@ -220,17 +220,21 @@ impl eframe::App for ReplayManager {
                         .into_iter()
                         .cmp(videoutils::get_creation_date(b))
                 }),
-                Sorting::Name => self
-                    .replays
-                    .sort_by(|a, b| videoutils::get_name(a).cmp(&videoutils::get_name(b))),
+                Sorting::Name => self.replays.sort_by(|a, b| {
+                    videoutils::get_name(a)
+                        .into_iter()
+                        .cmp(&mut videoutils::get_name(b).into_iter())
+                }),
                 Sorting::ModificationDate => self.replays.sort_by(|a, b| {
                     videoutils::get_mod_date(a)
                         .into_iter()
                         .cmp(videoutils::get_mod_date(b))
                 }),
-                Sorting::Size => self
-                    .replays
-                    .sort_by(|a, b| videoutils::get_size(a).cmp(&videoutils::get_size(b))),
+                Sorting::Size => self.replays.sort_by(|a, b| {
+                    videoutils::get_size(a)
+                        .into_iter()
+                        .cmp(&mut videoutils::get_size(b).into_iter())
+                }),
             }
 
             if !self.ascending {
