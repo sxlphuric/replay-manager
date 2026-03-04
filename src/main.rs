@@ -29,7 +29,9 @@ fn main() -> eframe::Result {
 }
 
 #[cfg(test)]
+#[allow(unused_imports)]
 mod tests {
+
     use crate::{thumbnails, videoutils};
     use std::path::PathBuf;
     // [TODO] Find a way to get these tests to work
