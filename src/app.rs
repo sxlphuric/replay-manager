@@ -382,27 +382,19 @@ impl eframe::App for ReplayManager {
                                         button_response.context_menu(|ui| {
                                             if ui.button("Edit").clicked() {
                                                 let entry_path = format!("{}", entry.display());
-                                                match open::with(&entry_path, "losslesscut") {
-                                                    Ok(_) => {}
-                                                    Err(_) => {
-                                                        self.error = Some(Err(anyhow!(format!(
-                                                            "Failed to open Losslesscut: {}",
-                                                            &entry_path
-                                                        ))))
-                                                    }
-                                                }
+                                                std::thread::spawn(move || {
+                                                                                                    if let Err(e) = open::with(&entry_path,"losslesscut") {
+                                                                                                        eprintln!("Failed to open losslesscut: {}", e);
+                                                                                                    };
+                                                                                                });
                                             }
                                             if ui.button("View").clicked() {
                                                 let entry_path = format!("{}", entry.display());
-                                                match open::that(&entry_path) {
-                                                    Ok(_) => {}
-                                                    Err(_) => {
-                                                        self.error = Some(Err(anyhow!(format!(
-                                                            "Failed to open file: {}",
-                                                            &entry_path
-                                                        ))))
-                                                    }
-                                                }
+                                                std::thread::spawn(move || {
+                                                    if let Err(e) = open::that(&entry_path) {
+                                                        eprintln!("Failed to open file: {}", e);
+                                                    };
+                                                });
                                             }
                                             if ui.button("Delete").clicked() {
                                                 self.delete_popup = Some(i);
@@ -518,15 +510,12 @@ impl eframe::App for ReplayManager {
                                         });
                                         if button_response.double_clicked() {
                                             let entry_path = format!("{}", entry.display());
-                                            match open::that(&entry_path) {
-                                                Ok(_) => {}
-                                                Err(_) => {
-                                                    self.error = Some(Err(anyhow!(format!(
-                                                        "Failed to open file: {}",
-                                                        &entry_path
-                                                    ))))
-                                                }
-                                            }
+
+                                            std::thread::spawn(move || {
+                                                                                                if let Err(e) = open::that(&entry_path) {
+                                                                                                    eprintln!("Failed to open file: {}", e);
+                                                                                                };
+                                                                                            });
                                         }
 
                                         if button_response.clicked() {
