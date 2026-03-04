@@ -51,6 +51,8 @@ pub struct ReplayManager {
     catbox_upload_send: mpsc::Sender<Result<String, String>>,
     #[serde(skip)]
     infinite_scroll: egui_infinite_scroll::InfiniteScroll<i32, i32>,
+    #[serde(skip)]
+    settings_popup: bool,
 }
 
 impl Default for ReplayManager {
@@ -75,6 +77,7 @@ impl Default for ReplayManager {
                 let end = start + 100;
                 callback(Ok(((start..end).collect(), Some(end))))
             }),
+            settings_popup: false,
         }
     }
 }
@@ -105,42 +108,52 @@ impl eframe::App for ReplayManager {
 
             egui::MenuBar::new().ui(ui, |ui| {
                 // NOTE: no File->Quit on web pages!
-                let is_web = cfg!(target_arch = "wasm32");
-                if !is_web {
-                    ui.menu_button("File", |ui| {
-                        if ui.button("Quit").clicked() {
-                            ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+                ui.menu_button("File", |ui| {
+                    if ui.button("Quit").clicked() {
+                        ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+                    }
+                    if ui.button("Settings").clicked() {
+                        self.settings_popup = true;
+                    }
+                });
+                ui.menu_button("View", |ui| {
+                    ui.menu_button("Sort...", |ui| {
+                        ui.radio_value(
+                            &mut self.sort_order,
+                            Sorting::CreationDate,
+                            "Creation Date",
+                        );
+                        ui.radio_value(
+                            &mut self.sort_order,
+                            Sorting::ModificationDate,
+                            "Modification Date",
+                        );
+                        ui.radio_value(&mut self.sort_order, Sorting::Name, "Name");
+                        ui.radio_value(&mut self.sort_order, Sorting::Size, "File Size");
+                    });
+                    ui.menu_button("Order", |ui| {
+                        if ui.radio(self.ascending, "Ascending").clicked() {
+                            self.ascending = true;
                         }
-                    });
-                    ui.menu_button("View", |ui| {
-                        ui.menu_button("Sort...", |ui| {
-                            ui.radio_value(
-                                &mut self.sort_order,
-                                Sorting::CreationDate,
-                                "Creation Date",
-                            );
-                            ui.radio_value(
-                                &mut self.sort_order,
-                                Sorting::ModificationDate,
-                                "Modification Date",
-                            );
-                            ui.radio_value(&mut self.sort_order, Sorting::Name, "Name");
-                            ui.radio_value(&mut self.sort_order, Sorting::Size, "File Size");
-                        });
-                        ui.menu_button("Order", |ui| {
-                            if ui.radio(self.ascending, "Ascending").clicked() {
-                                self.ascending = true;
-                            }
-                            if ui.radio(!self.ascending, "Descending").clicked() {
-                                self.ascending = false;
-                            };
-                        })
-                    });
-                    ui.add_space(16.0);
-                }
+                        if ui.radio(!self.ascending, "Descending").clicked() {
+                            self.ascending = false;
+                        };
+                    })
+                });
+                ui.add_space(16.0);
 
                 egui::widgets::global_theme_preference_buttons(ui);
             });
+            if self.settings_popup {
+                let _window = egui::Window::new("Settings")
+                    .collapsible(false)
+                    .open(&mut self.settings_popup)
+                    .resizable(false)
+                    .show(ctx, |ui| {
+                        ui.set_min_width(310.0);
+                        ui.label("Hello world");
+                    });
+            }
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
