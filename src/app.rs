@@ -151,7 +151,25 @@ impl eframe::App for ReplayManager {
                     .resizable(false)
                     .show(ctx, |ui| {
                         ui.set_min_width(310.0);
-                        ui.label("Hello world");
+                        ui.heading("Replay settings");
+                        ui.horizontal(|ui| {
+                            ui.label(
+                                "Replay videos folder location (default $HOME/Videos/Replays/): ",
+                            );
+                            /*ui.text_edit_singleline(&mut format!(
+                                "{}",
+                                self.replay_folder.display()
+                            ));*/
+                            // [TODO] Turn the replay_folder PathBuf into a string so it can be processed here
+                        });
+                        ui.horizontal(|ui| {
+                            ui.label("Replay prefix (default: Replay_): ");
+                            ui.text_edit_singleline(&mut self.replay_prefix);
+                        });
+                        ui.horizontal(|ui| {
+                            ui.label("Replay format (default: mp4): ");
+                            ui.text_edit_singleline(&mut self.replay_format);
+                        });
                     });
             }
         });

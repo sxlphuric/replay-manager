@@ -42,7 +42,7 @@ cargo install --path .
 ## Roadmap
 - Catbox authentication with user token
 - Better search bar (make full screen width)
-- Add settings for the replay folders and stuff
+- Change the replay_folder field in ReplayManager object from PathBuf to String (or add another field that is a string)
 - Fix the grid so that it doesnt have only 3 rows and look weird on different screen resolutions
 - Customize UI?
 - Keyboard shortcuts
