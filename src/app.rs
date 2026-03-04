@@ -6,7 +6,6 @@ use anyhow::anyhow;
 use catbox;
 use eframe::egui::{self, Color32};
 use egui_file_dialog::FileDialog;
-use egui_infinite_scroll::InfiniteScroll;
 use glob::glob;
 use std::sync::mpsc;
 use std::{path::PathBuf, process::Command};
@@ -93,11 +92,6 @@ impl Default for ReplayManager {
             catbox_upload_state: CatboxUploadState::Idle,
             catbox_upload_send: tx,
             catbox_upload_recv: rx,
-            infinite_scroll: InfiniteScroll::new().end_loader(|cursor, callback| {
-                let start = cursor.unwrap_or(0);
-                let end = start + 100;
-                callback(Ok(((start..end).collect(), Some(end))))
-            }),
             settings_popup: false,
             error: None,
             file_dialog: FileDialog::new(),
