@@ -554,7 +554,7 @@ impl eframe::App for ReplayManager {
                                                     "Are you sure you want to delete {}?",
                                                     entry.display()
                                                 ));
-                                                ui.strong("This cannot be undone.");
+                                                ui.strong("This is permanent and cannot be undone.");
 
                                                 ui.horizontal(|ui| {
                                                     if ui.button("Yes").clicked() {
