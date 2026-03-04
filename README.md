@@ -45,7 +45,6 @@ cargo install --path .
 - Fix the grid so that it resizes properly
 - Customize UI?
 - Keyboard shortcuts
-- Catbox upload popup button (Cancel and Ok)
 - Litterbox fallback when file too big for catbox
 - Use the thumbnail or something crate/ ez-ffmpeg when ffmpeg-next is fixed (IF POSSIBLE)
 - Possibly rewrite gpu-screen-recorder in rust :3
