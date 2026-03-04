@@ -1,14 +1,11 @@
-use crate::thumbnails;
-use crate::videoutils;
-use anyhow::Error;
-use anyhow::Result;
-use anyhow::anyhow;
+use crate::{thumbnails, videoutils};
+use anyhow::{Error, Result, anyhow};
 use catbox;
 use eframe::egui::{self, Color32};
 use egui_file_dialog::FileDialog;
+use egui_notify::Toast;
 use glob::glob;
-use std::sync::mpsc;
-use std::{path::PathBuf, process::Command};
+use std::{path::PathBuf, process::Command, sync::mpsc, time::Duration};
 
 #[derive(PartialEq, serde::Deserialize, serde::Serialize)]
 enum Sorting {
@@ -58,8 +55,6 @@ pub struct ReplayManager {
     catbox_upload_recv: mpsc::Receiver<Result<String, String>>,
     #[serde(skip)]
     catbox_upload_send: mpsc::Sender<Result<String, String>>,
-    #[serde(skip)]
-    infinite_scroll: egui_infinite_scroll::InfiniteScroll<i32, i32>,
     #[serde(skip)]
     settings_popup: bool,
     #[serde(skip)]
