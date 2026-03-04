@@ -39,7 +39,7 @@ cd replay-manager
 cargo install --path .
 ```
 
-## Tasks
+## TODO
 - Catbox authentication with user token
 - Better search bar (make full screen width)
 - Fix the grid so that it doesnt have only 3 rows and look weird on different screen resolutions
