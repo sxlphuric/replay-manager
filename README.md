@@ -1,5 +1,5 @@
 # replay-manager
-**⚠️ WARNING! This is not a finished project. Expect bugs and unpolishedness.**
+**⚠️ WARNING! This is not a finished project. Expect bugs and unpolishedness.**
 
 This is the Replay Manager.
 It can go in a folder you specify, and will list all the files with a specific file extension. It even creates thumbnails for them with the custom thumbnail script. Furthermore, you can share files to Catbox (litter) and open videos in the Losslesscut video editor.
@@ -56,3 +56,4 @@ cargo install --path .
 - Add side panel for catbox file send operations
 - Optimize, the app seems to use alot of cpu while multithreading
 - Add multiple file display modes (list, grid etc)
+- Change catbox uploads to allow multiple uploads at the same time
