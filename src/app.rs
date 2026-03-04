@@ -29,6 +29,7 @@ enum CatboxUploadState {
 #[serde(default)]
 pub struct ReplayManager {
     replay_folder: PathBuf,
+    replay_folder_string: String,
     replay_format: String,
     replay_prefix: String,
 
@@ -60,6 +61,7 @@ impl Default for ReplayManager {
         let (tx, rx) = mpsc::channel();
         Self {
             replay_folder: PathBuf::from("/home/aredfx/Videos/Replays"),
+            replay_folder_string: "/home/aredfx/Videos/Replays".to_string(),
             replay_format: "mp4".to_string(),
             replay_prefix: "Replay_".to_string(),
             delete_popup: None,
@@ -150,17 +152,14 @@ impl eframe::App for ReplayManager {
                     .open(&mut self.settings_popup)
                     .resizable(false)
                     .show(ctx, |ui| {
-                        ui.set_min_width(310.0);
+                        ui.set_min_width(420.0);
                         ui.heading("Replay settings");
                         ui.horizontal(|ui| {
                             ui.label(
                                 "Replay videos folder location (default $HOME/Videos/Replays/): ",
                             );
-                            /*ui.text_edit_singleline(&mut format!(
-                                "{}",
-                                self.replay_folder.display()
-                            ));*/
-                            // [TODO] Turn the replay_folder PathBuf into a string so it can be processed here
+                            ui.text_edit_singleline(&mut self.replay_folder_string);
+                            self.replay_folder = PathBuf::from(&self.replay_folder_string)
                         });
                         ui.horizontal(|ui| {
                             ui.label("Replay prefix (default: Replay_): ");
