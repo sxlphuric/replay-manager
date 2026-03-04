@@ -58,8 +58,6 @@ pub struct ReplayManager {
     #[serde(skip)]
     settings_popup: bool,
     #[serde(skip)]
-    error_modal: bool,
-    #[serde(skip)]
     error: Option<Result<(), Error>>,
 
     #[serde(skip)]
@@ -81,7 +79,6 @@ impl Default for ReplayManager {
             replay_prefix: "Replay_".to_string(),
             delete_popup: None,
             catbox_popup: None,
-            error_modal: false,
             replays: vec![],
             loading_done: false,
             sort_order: Sorting::ModificationDate,
@@ -349,7 +346,6 @@ impl eframe::App for ReplayManager {
                                         "{}",
                                         thumbnail_path_result.unwrap_err()
                                     ))));
-                                    self.error_modal = true;
                                 }
 
                                 let thumbnail_image = egui::Image::from_uri(format!(
@@ -365,7 +361,6 @@ impl eframe::App for ReplayManager {
                                     file_stem = file_stem_opt.unwrap();
                                 } else {
                                     self.error = Some(Err(anyhow!(format!("{:?}", file_stem_opt))));
-                                    self.error_modal = true;
                                     file_stem = std::ffi::OsStr::new("undefined");
                                 }
 
