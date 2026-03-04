@@ -84,7 +84,7 @@ impl Default for ReplayManager {
             error_modal: false,
             replays: vec![],
             loading_done: false,
-            sort_order: Sorting::CreationDate,
+            sort_order: Sorting::ModificationDate,
             ascending: false,
             search_query: "".to_string(),
             catbox_upload_state: CatboxUploadState::Idle,
