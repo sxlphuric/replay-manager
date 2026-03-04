@@ -68,3 +68,4 @@ cargo install --path .
 - [] Keyboard shortcuts
 - [] Catbox authentication
 - [] Thumbnail generation multithreading
+- [] Cross-platform support
