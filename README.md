@@ -59,3 +59,4 @@ cargo install --path .
 - Change catbox uploads to allow multiple uploads at the same time
 - Add icon
 - Working tests
+- Fix bug when changing folder of replays
