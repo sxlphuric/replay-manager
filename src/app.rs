@@ -313,6 +313,7 @@ impl eframe::App for ReplayManager {
                                 } else {
                                     self.error = Some(Err(anyhow!(format!("{:?}", file_stem_opt))));
                                     self.error_modal = true;
+                                    file_stem = std::ffi::OsStr::new("undefined");
                                 }
 
                                 if format!("{}", file_stem.to_string_lossy())
@@ -333,93 +334,33 @@ impl eframe::App for ReplayManager {
                                         button_response.context_menu(|ui| {
                                             if ui.button("Edit").clicked() {
                                                 let entry_path = format!("{}", entry.display());
-                                                let _ = std::thread::spawn(move || {
-                                                    let rt =
-                                                        tokio::runtime::Runtime::new().unwrap();
-
-                                                    let _ = rt.spawn_blocking(|| {
-                                                        let command_output =
-                                                            Command::new("losslesscut")
-                                                                .arg(entry_path)
-                                                                .output();
-                                                        if command_output.is_ok() {
-                                                            let command_output_unwrap =
-                                                                command_output.unwrap();
-                                                            if !command_output_unwrap
-                                                                .status
-                                                                .success()
-                                                            {
-                                                                let error_message =
-                                                                    String::from_utf8(
-                                                                        command_output_unwrap
-                                                                            .stderr,
-                                                                    );
-                                                                if error_message.is_ok() {
-                                                                    self.error =
-                                                                        Some(Err(anyhow!(
-                                                                            error_message.unwrap()
-                                                                        )));
-                                                                } else {
-                                                                    self.error = Some(Err(anyhow!(
-                                                                        error_message.unwrap_err()
-                                                                    )))
-                                                                }
-                                                            }
-                                                        } else {
-                                                            self.error =
-                                                                Some(Err(anyhow!(format!(
-                                                                    "{}",
-                                                                    command_output.unwrap_err()
-                                                                ))));
-                                                            self.error_modal = true;
-                                                        }
-                                                    });
-                                                });
+                                                match Command::new("xdg-open")
+                                                    .arg(&entry_path)
+                                                    .spawn()
+                                                {
+                                                    Ok(_) => {}
+                                                    Err(_) => {
+                                                        self.error = Some(Err(anyhow!(format!(
+                                                            "Failed to open file: {}",
+                                                            &entry_path
+                                                        ))))
+                                                    }
+                                                }
                                             }
                                             if ui.button("View").clicked() {
                                                 let entry_path = format!("{}", entry.display());
-                                                let _ = std::thread::spawn(move || {
-                                                    let rt =
-                                                        tokio::runtime::Runtime::new().unwrap();
-
-                                                    let _ = rt.spawn_blocking(|| {
-                                                        let command_output =
-                                                            Command::new("xdg-open")
-                                                                .arg(entry_path)
-                                                                .output();
-                                                        if command_output.is_ok() {
-                                                            let command_output_unwrap =
-                                                                command_output.unwrap();
-                                                            if !command_output_unwrap
-                                                                .status
-                                                                .success()
-                                                            {
-                                                                let error_message =
-                                                                    String::from_utf8(
-                                                                        command_output_unwrap
-                                                                            .stderr,
-                                                                    );
-                                                                if error_message.is_ok() {
-                                                                    self.error =
-                                                                        Some(Err(anyhow!(
-                                                                            error_message.unwrap()
-                                                                        )));
-                                                                } else {
-                                                                    self.error = Some(Err(anyhow!(
-                                                                        error_message.unwrap_err()
-                                                                    )))
-                                                                }
-                                                            }
-                                                        } else {
-                                                            self.error =
-                                                                Some(Err(anyhow!(format!(
-                                                                    "{}",
-                                                                    command_output.unwrap_err()
-                                                                ))));
-                                                            self.error_modal = true;
-                                                        }
-                                                    });
-                                                });
+                                                match Command::new("xdg-open")
+                                                    .arg(&entry_path)
+                                                    .spawn()
+                                                {
+                                                    Ok(_) => {}
+                                                    Err(_) => {
+                                                        self.error = Some(Err(anyhow!(format!(
+                                                            "Failed to open file: {}",
+                                                            &entry_path
+                                                        ))))
+                                                    }
+                                                }
                                             }
                                             if ui.button("Delete").clicked() {
                                                 self.delete_popup = Some(i);
@@ -449,39 +390,16 @@ impl eframe::App for ReplayManager {
                                         });
                                         if button_response.double_clicked() {
                                             let entry_path = format!("{}", entry.display());
-                                            let _ = std::thread::spawn(move || {
-                                                let rt = tokio::runtime::Runtime::new().unwrap();
-
-                                                let _ = rt.spawn_blocking(|| {
-                                                    let command_output = Command::new("xdg-open")
-                                                        .arg(entry_path)
-                                                        .output();
-                                                    if command_output.is_ok() {
-                                                        let command_output_unwrap =
-                                                            command_output.unwrap();
-                                                        if !command_output_unwrap.status.success() {
-                                                            let error_message = String::from_utf8(
-                                                                command_output_unwrap.stderr,
-                                                            );
-                                                            if error_message.is_ok() {
-                                                                self.error = Some(Err(anyhow!(
-                                                                    error_message.unwrap()
-                                                                )));
-                                                            } else {
-                                                                self.error = Some(Err(anyhow!(
-                                                                    error_message.unwrap_err()
-                                                                )))
-                                                            }
-                                                        }
-                                                    } else {
-                                                        self.error = Some(Err(anyhow!(format!(
-                                                            "{}",
-                                                            command_output.unwrap_err()
-                                                        ))));
-                                                        self.error_modal = true;
-                                                    }
-                                                });
-                                            });
+                                            match Command::new("xdg-open").arg(&entry_path).spawn()
+                                            {
+                                                Ok(_) => {}
+                                                Err(_) => {
+                                                    self.error = Some(Err(anyhow!(format!(
+                                                        "Failed to open file: {}",
+                                                        &entry_path
+                                                    ))))
+                                                }
+                                            }
                                         }
 
                                         if button_response.clicked() {
