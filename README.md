@@ -42,12 +42,11 @@ cargo install --path .
 ## TODO
 - Catbox authentication with user token
 - Better search bar (make full screen width)
-- Fix the grid so that it doesnt have only 3 rows and look weird on different screen resolutions
+- Fix the grid so that it resizes properly
 - Customize UI?
 - Keyboard shortcuts
 - Catbox upload popup button (Cancel and Ok)
-- Make it so you can click or copy the link on the Catbox popup
-- Implement a way to choose how to send files to Catbox and Add settings that allow you to choose which Catbox options (litter or normal, time, fallback to litter when file to big or not)
+- Litterbox fallback when file too big for catbox
 - Use the thumbnail or something crate/ ez-ffmpeg when ffmpeg-next is fixed (IF POSSIBLE)
 - Possibly rewrite gpu-screen-recorder in rust :3
 - Fix light mode
@@ -58,7 +57,6 @@ cargo install --path .
 - Change catbox uploads to allow multiple uploads at the same time
 - Add icon
 - Working tests
-- Fix bug when changing folder of replays
 - Fix the inputs in settings not being aligned
 ## Roadmap
 - [] Fix light mode
