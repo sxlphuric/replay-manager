@@ -66,3 +66,4 @@ cargo install --path .
 - [] Polish
 - [] Keyboard shortcuts
 - [] Catbox authentication
+- [] Thumbnail generation multithreading
