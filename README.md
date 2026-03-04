@@ -57,3 +57,4 @@ cargo install --path .
 - Optimize, the app seems to use alot of cpu while multithreading
 - Add multiple file display modes (list, grid etc)
 - Change catbox uploads to allow multiple uploads at the same time
+- Add icon
