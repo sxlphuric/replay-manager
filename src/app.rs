@@ -19,6 +19,13 @@ enum Sorting {
     Size,
 }
 
+#[derive(PartialEq, Debug, serde::Deserialize, serde::Serialize)]
+enum LitterboxUploadTime {
+    OneHour,
+    TwelveHours,
+    OneDay,
+    ThreeDays,
+}
 #[derive(Default, serde::Deserialize, serde::Serialize)]
 enum CatboxUploadState {
     #[default]
@@ -63,6 +70,9 @@ pub struct ReplayManager {
 
     #[serde(skip)]
     file_dialog: FileDialog,
+
+    litterbox_upload_time: LitterboxUploadTime,
+    catbox_litter: bool,
 }
 
 impl Default for ReplayManager {
@@ -91,6 +101,8 @@ impl Default for ReplayManager {
             settings_popup: false,
             error: None,
             file_dialog: FileDialog::new(),
+            litterbox_upload_time: LitterboxUploadTime::ThreeDays,
+            catbox_litter: true,
         }
     }
 }
@@ -191,6 +203,34 @@ impl eframe::App for ReplayManager {
                             ui.label("Replay format (default: mp4): ");
                             ui.text_edit_singleline(&mut self.replay_format);
                         });
+
+                        ui.heading("Catbox");
+                        ui.checkbox(&mut self.catbox_litter, "Use litterbox");
+
+                        let _dropdown = egui::ComboBox::from_label("Litterbox file deletion time")
+                            .selected_text(format!("{:?}", self.litterbox_upload_time))
+                            .show_ui(ui, |ui| {
+                                ui.selectable_value(
+                                    &mut self.litterbox_upload_time,
+                                    LitterboxUploadTime::OneHour,
+                                    "One hour",
+                                );
+                                ui.selectable_value(
+                                    &mut self.litterbox_upload_time,
+                                    LitterboxUploadTime::TwelveHours,
+                                    "Twelve hours",
+                                );
+                                ui.selectable_value(
+                                    &mut self.litterbox_upload_time,
+                                    LitterboxUploadTime::OneDay,
+                                    "A day",
+                                );
+                                ui.selectable_value(
+                                    &mut self.litterbox_upload_time,
+                                    LitterboxUploadTime::ThreeDays,
+                                    "Three days",
+                                );
+                            });
                     });
             }
         });
@@ -386,17 +426,103 @@ impl eframe::App for ReplayManager {
                                                 let tx = self.catbox_upload_send.clone();
                                                 let ctx = ctx.clone();
 
-                                                std::thread::spawn(move || {
-                                                    let rt =
-                                                        tokio::runtime::Runtime::new().unwrap();
+                                                if self.catbox_litter {
+                                                    match self.litterbox_upload_time {
+                                                        LitterboxUploadTime::OneHour => {
+                                                            std::thread::spawn(move || {
+                                                                let rt =
+                                                                    tokio::runtime::Runtime::new()
+                                                                        .unwrap();
 
-                                                    let result = rt.block_on(async {
-                                                        catbox::litter::upload(entry_path, 72).await
+                                                                let result = rt.block_on(async {
+                                                                    catbox::litter::upload(
+                                                                        entry_path, 1,
+                                                                    )
+                                                                    .await
+                                                                });
+                                                                let _ = tx
+                                                                    .send(result.map_err(|e| {
+                                                                        e.to_string()
+                                                                    }));
+                                                                ctx.request_repaint();
+                                                            });
+                                                        }
+                                                        LitterboxUploadTime::TwelveHours => {
+                                                            std::thread::spawn(move || {
+                                                                let rt =
+                                                                    tokio::runtime::Runtime::new()
+                                                                        .unwrap();
+
+                                                                let result = rt.block_on(async {
+                                                                    catbox::litter::upload(
+                                                                        entry_path, 12,
+                                                                    )
+                                                                    .await
+                                                                });
+                                                                let _ = tx
+                                                                    .send(result.map_err(|e| {
+                                                                        e.to_string()
+                                                                    }));
+                                                                ctx.request_repaint();
+                                                            });
+                                                        }
+                                                        LitterboxUploadTime::OneDay => {
+                                                            std::thread::spawn(move || {
+                                                                let rt =
+                                                                    tokio::runtime::Runtime::new()
+                                                                        .unwrap();
+
+                                                                let result = rt.block_on(async {
+                                                                    catbox::litter::upload(
+                                                                        entry_path, 24,
+                                                                    )
+                                                                    .await
+                                                                });
+                                                                let _ = tx
+                                                                    .send(result.map_err(|e| {
+                                                                        e.to_string()
+                                                                    }));
+                                                                ctx.request_repaint();
+                                                            });
+                                                        }
+                                                        LitterboxUploadTime::ThreeDays => {
+                                                            std::thread::spawn(move || {
+                                                                let rt =
+                                                                    tokio::runtime::Runtime::new()
+                                                                        .unwrap();
+
+                                                                let result = rt.block_on(async {
+                                                                    catbox::litter::upload(
+                                                                        entry_path, 72,
+                                                                    )
+                                                                    .await
+                                                                });
+                                                                let _ = tx
+                                                                    .send(result.map_err(|e| {
+                                                                        e.to_string()
+                                                                    }));
+                                                                ctx.request_repaint();
+                                                            });
+                                                        }
+                                                    }
+                                                } else {
+                                                    std::thread::spawn(move || {
+                                                        let rt =
+                                                            tokio::runtime::Runtime::new().unwrap();
+
+                                                        let result = rt.block_on(async {
+                                                            catbox::file::from_file(
+                                                                entry_path, None,
+                                                            )
+                                                            .await
+                                                        });
+
+                                                        let _ = tx.send(
+                                                            result.map_err(|e| e.to_string()),
+                                                        );
+                                                        ctx.request_repaint();
                                                     });
-                                                    let _ =
-                                                        tx.send(result.map_err(|e| e.to_string()));
-                                                    ctx.request_repaint();
-                                                });
+                                                }
 
                                                 self.catbox_popup = Some(i);
                                             }
@@ -464,6 +590,13 @@ impl eframe::App for ReplayManager {
 
                                                 ui.heading("Share");
 
+                                                let litter_time = match self.litterbox_upload_time {
+                                                    LitterboxUploadTime::OneHour => "1 hour",
+                                                    LitterboxUploadTime::TwelveHours => "12 hours",
+                                                    LitterboxUploadTime::OneDay => "1 day",
+                                                    LitterboxUploadTime::ThreeDays => "3 days",
+                                                };
+
                                                 match &self.catbox_upload_state {
                                                     &CatboxUploadState::Idle => {
                                                         ui.horizontal(|ui| {
@@ -484,10 +617,19 @@ impl eframe::App for ReplayManager {
                                                     }
                                                     CatboxUploadState::Done(link) => {
                                                         ui.label("Upload finished!");
-                                                        ui.strong(
-                                                        "Your file will be deleted after 3 days.",
-                                                    );
-                                                        ui.hyperlink(link);
+                                                        if self.catbox_litter {
+
+                                                            ui.strong(format!(
+                                                                                                                        "Your file will be deleted after {}",
+                                                                                                                        litter_time
+                                                                                                                    ));
+                                                        }
+                                                        ui.horizontal(|ui| {
+                                                            ui.hyperlink(link);
+                                                            if ui.button("Copy").clicked() {
+                                                                ui.ctx().copy_text(link.clone());
+                                                            }
+                                                        });
                                                     }
                                                 }
                                                 ui.horizontal(|ui| {
