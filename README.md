@@ -60,6 +60,7 @@ cargo install --path .
 - Add icon
 - Working tests
 - Fix bug when changing folder of replays
+- Fix the inputs in settings not being aligned
 ## Roadmap
 - [] Fix light mode
 - [] Optimize
