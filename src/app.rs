@@ -106,7 +106,7 @@ impl ReplayManager {
         if let Some(storage) = cc.storage {
             eframe::get_value(storage, eframe::APP_KEY).unwrap_or_default()
         } else {
-        Default::default()
+            Default::default()
         }
     }
 }
@@ -276,7 +276,7 @@ impl eframe::App for ReplayManager {
                 10.0, 10.0,
             );
             let ui_minus_spacing = ui.available_width(); //- 2.0*grid_spacing.x - ui.style().spacing.window_margin.left as f32 - ui.style().spacing.window_margin.right as f32 / min_col_width;
-            let column_count = ui_minus_spacing.floor() as usize;
+            let column_count = (ui_minus_spacing / min_col_width).floor() as usize;
 
             let mut row_reset = 0;
             let image_size = egui::Vec2::new(160.0, 120.0);
