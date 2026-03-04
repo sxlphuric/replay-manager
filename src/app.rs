@@ -539,7 +539,7 @@ impl eframe::App for ReplayManager {
                                         }
 
                                         if i == replay_count - 1 && !self.loading_done {
-                                            self.toasts.info(format!("Finished loading {} replays",replay_count)).duration(Duration::from_secs(5));
+                                            self.toasts.success(format!("Finished loading {} replays",replay_count)).duration(Duration::from_secs(5));
                                             self.loading_done = true
                                         }
 
@@ -568,7 +568,7 @@ impl eframe::App for ReplayManager {
                                                             .arg(format!("{}", entry.display()))
                                                             .spawn();
                                                         // [TODO] error handling for file stem
-                                                        self.toasts.info(format!("Deleted {}", entry.file_stem().unwrap().display())).duration(Duration::from_secs(5));
+                                                        self.toasts.success(format!("Deleted {}", entry.file_stem().unwrap().display())).duration(Duration::from_secs(5));
                                                         self.delete_popup = None;
                                                     }
                                                     if ui.button("No").clicked() {
@@ -613,7 +613,7 @@ impl eframe::App for ReplayManager {
                                                     }
                                                     CatboxUploadState::Done(link) => {
                                                         ui.label("Upload finished!");
-                                                        self.toasts.info("Catbox upload finished").duration(Duration::from_secs(5));
+                                                        self.toasts.success("Catbox upload finished").duration(Duration::from_secs(5));
                                                         if self.catbox_litter {
 
                                                             ui.strong(format!(
