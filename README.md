@@ -58,3 +58,4 @@ cargo install --path .
 - Add multiple file display modes (list, grid etc)
 - Change catbox uploads to allow multiple uploads at the same time
 - Add icon
+- Working tests
