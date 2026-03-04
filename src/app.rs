@@ -3,7 +3,7 @@ use anyhow::{Error, Result, anyhow};
 use catbox;
 use eframe::egui::{self, Color32};
 use egui_file_dialog::FileDialog;
-use egui_notify::Toast;
+use egui_notify::Toasts;
 use glob::glob;
 use std::{path::PathBuf, process::Command, sync::mpsc, time::Duration};
 
@@ -67,6 +67,9 @@ pub struct ReplayManager {
 
     litterbox_upload_time: LitterboxUploadTime,
     catbox_litter: bool,
+
+    #[serde(skip)]
+    toasts: Toasts,
 }
 
 impl Default for ReplayManager {
@@ -92,6 +95,7 @@ impl Default for ReplayManager {
             file_dialog: FileDialog::new(),
             litterbox_upload_time: LitterboxUploadTime::ThreeDays,
             catbox_litter: true,
+            toasts: Toasts::default(),
         }
     }
 }
@@ -181,6 +185,7 @@ impl eframe::App for ReplayManager {
                             }
                             self.file_dialog.update(ctx);
                             if let Some(path) = self.file_dialog.take_picked() {
+                                self.loading_done = false;
                                 self.replay_folder = Some(path.to_path_buf());
                             }
                         });
@@ -534,7 +539,7 @@ impl eframe::App for ReplayManager {
                                         }
 
                                         if i == replay_count - 1 && !self.loading_done {
-                                            //button_response.scroll_to_me(Some(egui::Align::BOTTOM));
+                                            self.toasts.info(format!("Finished loading {} replays",replay_count)).duration(Duration::from_secs(5));
                                             self.loading_done = true
                                         }
 
@@ -561,7 +566,9 @@ impl eframe::App for ReplayManager {
                                                         let _ = Command::new("rm")
                                                             .arg("-rf")
                                                             .arg(format!("{}", entry.display()))
-                                                            .output();
+                                                            .spawn();
+                                                        // [TODO] error handling for file stem
+                                                        self.toasts.info(format!("Deleted {}", entry.file_stem().unwrap().display())).duration(Duration::from_secs(5));
                                                         self.delete_popup = None;
                                                     }
                                                     if ui.button("No").clicked() {
@@ -606,6 +613,7 @@ impl eframe::App for ReplayManager {
                                                     }
                                                     CatboxUploadState::Done(link) => {
                                                         ui.label("Upload finished!");
+                                                        self.toasts.info("Catbox upload finished").duration(Duration::from_secs(5));
                                                         if self.catbox_litter {
 
                                                             ui.strong(format!(
@@ -630,6 +638,7 @@ impl eframe::App for ReplayManager {
                                         );
                                     }
                                     if self.error.is_some() {
+                                        self.toasts.error("An error occured").duration(Duration::from_secs(5));
                                         egui::Modal::new(egui::Id::new(i)).show(
                                             ctx,
                                             |ui: &mut egui::Ui| {
@@ -665,5 +674,7 @@ impl eframe::App for ReplayManager {
                     });
                 });
         });
+
+        self.toasts.show(ctx);
     }
 }
