@@ -5,6 +5,7 @@ use anyhow::Result;
 use anyhow::anyhow;
 use catbox;
 use eframe::egui::{self, Color32};
+use egui_file_dialog::FileDialog;
 use egui_infinite_scroll::InfiniteScroll;
 use glob::glob;
 use std::sync::mpsc;
@@ -30,8 +31,7 @@ enum CatboxUploadState {
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)]
 pub struct ReplayManager {
-    replay_folder: PathBuf,
-    replay_folder_string: String,
+    replay_folder: Option<PathBuf>,
     replay_format: String,
     replay_prefix: String,
 
@@ -60,14 +60,16 @@ pub struct ReplayManager {
     error_modal: bool,
     #[serde(skip)]
     error: Option<Result<(), Error>>,
+
+    #[serde(skip)]
+    file_dialog: FileDialog,
 }
 
 impl Default for ReplayManager {
     fn default() -> Self {
         let (tx, rx) = mpsc::channel();
         Self {
-            replay_folder: PathBuf::from("/home/aredfx/Videos/Replays"),
-            replay_folder_string: "/home/aredfx/Videos/Replays".to_string(),
+            replay_folder: Some(PathBuf::from("/home/aredfx/Videos/Replays")),
             replay_format: "mp4".to_string(),
             replay_prefix: "Replay_".to_string(),
             delete_popup: None,
@@ -88,6 +90,7 @@ impl Default for ReplayManager {
             }),
             settings_popup: false,
             error: None,
+            file_dialog: FileDialog::new(),
         }
     }
 }
@@ -100,11 +103,11 @@ impl ReplayManager {
 
         // Load previous app state (if any).
         // Note that you must enable the `persistence` feature for this to work.
-        if let Some(storage) = cc.storage {
+        /*if let Some(storage) = cc.storage {
             eframe::get_value(storage, eframe::APP_KEY).unwrap_or_default()
-        } else {
-            Default::default()
-        }
+        } else {*/
+        Default::default()
+        //}
     }
 }
 
@@ -166,8 +169,19 @@ impl eframe::App for ReplayManager {
                             ui.label(
                                 "Replay videos folder location (default $HOME/Videos/Replays/): ",
                             );
-                            ui.text_edit_singleline(&mut self.replay_folder_string);
-                            self.replay_folder = PathBuf::from(&self.replay_folder_string)
+                            /*ui.strong(format!(
+                                "{}",
+                                self.replay_folder
+                                    .unwrap_or(PathBuf::from("error"))
+                                    .display()
+                            ));*/
+                            if ui.button("Choose").clicked() {
+                                self.file_dialog.pick_directory();
+                            }
+                            self.file_dialog.update(ctx);
+                            if let Some(path) = self.file_dialog.take_picked() {
+                                self.replay_folder = Some(path.to_path_buf());
+                            }
                         });
                         ui.horizontal(|ui| {
                             ui.label("Replay prefix (default: Replay_): ");
@@ -184,9 +198,10 @@ impl eframe::App for ReplayManager {
         egui::CentralPanel::default().show(ctx, |ui| {
             // The central panel the region left after adding TopPanel's and SidePanel's
             ui.heading("Replay Manager");
+            let replay_folder = self.replay_folder.clone().unwrap();
 
             ui.horizontal(|ui| {
-                ui.label(format!("Replays in {}", self.replay_folder.display()));
+                ui.label(format!("Replays in {}", replay_folder.display()));
             });
 
             ui.separator();
@@ -199,9 +214,13 @@ impl eframe::App for ReplayManager {
                 }
             });
 
+            if !self.replay_folder.is_some() {
+                self.error = Some(Err(anyhow!("Replay folder does not exist (is None)")))
+            }
+
             let replays_glob = glob(&format!(
                 "{}/**/{}*.{}",
-                self.replay_folder.to_string_lossy(),
+                replay_folder.to_string_lossy(),
                 self.replay_prefix,
                 self.replay_format
             ));
@@ -284,7 +303,7 @@ impl eframe::App for ReplayManager {
                             for (i, entry) in replay_enumerate {
                                 let thumbnail_path_result = thumbnails::create(
                                     &entry,
-                                    &format!("{}", self.replay_folder.display()),
+                                    &format!("{}", replay_folder.display()),
                                     true,
                                     0.0,
                                 );
