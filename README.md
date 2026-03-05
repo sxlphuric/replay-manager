@@ -68,3 +68,4 @@ cargo install --path .
 - [] Catbox authentication
 - [] Thumbnail generation multithreading
 - [] Cross-platform support
+- [] Logging with [tracing](https://docs.rs/tracing)
