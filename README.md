@@ -55,7 +55,6 @@ cargo install --path .
 - Change catbox uploads to allow multiple uploads at the same time
 - Add icon
 - Working tests
-- Fix the inputs in settings not being aligned
 - Use a toast instead of a scary modal to show errors
 - Add a way to select default action when double clicking video
 - Add a way to select video editor

@@ -177,11 +177,12 @@ impl eframe::App for ReplayManager {
                     .open(&mut self.settings_popup)
                     .resizable(false)
                     .show(ctx, |ui| {
-                        ui.set_min_width(420.0);
+                        ui.set_max_width(310.0);
                         ui.heading("Replay settings");
                         ui.horizontal(|ui| {
+                            ui.set_min_width(ui.available_width());
                             ui.label(
-                                "Replay videos folder location (default $HOME/Videos/Replays/): ",
+                                "Replay videos folder location (default: $HOME/Videos/Replays/):",
                             );
                             /*ui.strong(format!(
                                 "{}",
@@ -199,11 +200,13 @@ impl eframe::App for ReplayManager {
                             }
                         });
                         ui.horizontal(|ui| {
-                            ui.label("Replay prefix (default: Replay_): ");
+                            ui.set_min_width(ui.available_width());
+                            ui.label("Replay prefix (default: Replay_):");
                             ui.text_edit_singleline(&mut self.replay_prefix);
                         });
                         ui.horizontal(|ui| {
-                            ui.label("Replay format (default: mp4): ");
+                            ui.set_min_width(ui.available_width());
+                            ui.label("Replay format (default: mp4):");
                             ui.text_edit_singleline(&mut self.replay_format);
                         });
 
