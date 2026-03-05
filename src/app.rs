@@ -714,7 +714,7 @@ impl eframe::App for ReplayManager {
                                                                 litter_time
                                                             ));
                                                         }
-                                                        if ui.hyperlink(format!("{} {}", link, egui_material_icons::icons::ICON_CONTENT_COPY)).clicked() {
+                                                        if ui.link(format!("{} {}", link, egui_material_icons::icons::ICON_CONTENT_COPY)).clicked() {
                                                             ui.ctx().copy_text(link.clone());
                                                             self.toasts.info("Copied file link to clipboard").duration(Duration::from_secs(2));
                                                         };
