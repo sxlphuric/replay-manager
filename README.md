@@ -52,7 +52,6 @@ cargo install --path .
 - Add side panel for catbox file send operations
 - Optimize, the app seems to use alot of cpu while multithreading
 - Change catbox uploads to allow multiple uploads at the same time
-- Add icon
 - Working tests
 - Use a toast instead of a scary modal to show errors
 ## Roadmap
