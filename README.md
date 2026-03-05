@@ -27,9 +27,14 @@ Cargo.toml - Cargo dependencies
 ```
 
 ## How to install
+I'm assuming you already have Rust installed. If not, please go to https://rustup.rs/.
 ```bash
 # Install dependencies
+
+## Arch Linux
 yay -S losslesscut
+## MacOS
+brew install losslesscut ffmpeg
 
 # Clone the repo
 git clone https://github.com/sxlphuric/replay-manager
