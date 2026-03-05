@@ -138,6 +138,21 @@ impl eframe::App for ReplayManager {
                     if ui.button("Settings").clicked() {
                         self.settings_popup = true;
                     }
+                    ui.menu_button("Theme...", |ui| {
+                        let mut theme_preference = ui.ctx().options(|opt| opt.theme_preference);
+                        ui.radio_value(
+                            &mut theme_preference,
+                            egui::ThemePreference::System,
+                            "System",
+                        );
+                        ui.radio_value(
+                            &mut theme_preference,
+                            egui::ThemePreference::Light,
+                            "Light",
+                        );
+                        ui.radio_value(&mut theme_preference, egui::ThemePreference::Dark, "Dark");
+                        ui.ctx().set_theme(theme_preference);
+                    });
                 });
                 ui.menu_button("View", |ui| {
                     ui.menu_button("Sort...", |ui| {
@@ -168,8 +183,6 @@ impl eframe::App for ReplayManager {
                     })
                 });
                 ui.add_space(16.0);
-
-                egui::widgets::global_theme_preference_buttons(ui);
             });
             if self.settings_popup {
                 let _window = egui::Window::new("Settings")
