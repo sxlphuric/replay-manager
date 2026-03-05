@@ -58,11 +58,11 @@ cargo install --path .
 - Use a toast instead of a scary modal to show errors
 - Add a way to select default action when double clicking video
 ## Roadmap
-- [] Fix light mode
-- [] Optimize
-- [] Polish
-- [] Keyboard shortcuts
-- [] Catbox authentication
-- [] Thumbnail generation multithreading
-- [] Cross-platform support
-- [] Logging with [tracing](https://docs.rs/tracing)
+- [ ] Fix light mode
+- [ ] Optimize
+- [ ] Polish
+- [ ] Keyboard shortcuts
+- [ ] Catbox authentication
+- [ ] Thumbnail generation multithreading
+- [ ] Cross-platform support
+- [ ] Logging with [tracing](https://docs.rs/tracing)
