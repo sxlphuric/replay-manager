@@ -286,7 +286,6 @@ impl eframe::App for ReplayManager {
                 ui.label(format!("Replays in {}", replay_folder.display()));
             });
 
-            ui.separator();
 
             ui.horizontal(|ui| {
                 ui.label("Search:");
@@ -295,6 +294,8 @@ impl eframe::App for ReplayManager {
                     self.search_query = "".to_string()
                 }
             });
+
+            ui.separator();
 
             if !self.replay_folder.is_some() {
                 self.error = Some(Err(anyhow!("Replay folder does not exist (is None)")))
