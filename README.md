@@ -56,7 +56,6 @@ cargo install --path .
 - Add icon
 - Working tests
 - Use a toast instead of a scary modal to show errors
-- Add a way to select default action when double clicking video
 ## Roadmap
 - [ ] Fix light mode
 - [ ] Optimize

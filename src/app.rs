@@ -38,6 +38,12 @@ enum CatboxUploadState {
     Error(String),
 }
 
+#[derive(Debug, PartialEq, serde::Deserialize, serde::Serialize)]
+enum DefaultFileAction {
+    View,
+    Edit,
+}
+
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)]
 pub struct ReplayManager {
@@ -45,6 +51,7 @@ pub struct ReplayManager {
     replay_format: String,
     replay_prefix: String,
     display_mode: DisplayMode,
+    default_file_action: DefaultFileAction,
 
     #[serde(skip)]
     delete_popup: Option<usize>,
@@ -105,6 +112,7 @@ impl Default for ReplayManager {
             toasts: Toasts::default(),
             display_mode: DisplayMode::Grid,
             video_editor: String::from("losslesscut"),
+            default_file_action: DefaultFileAction::View,
         }
     }
 }
@@ -254,6 +262,20 @@ impl eframe::App for ReplayManager {
                             ui.label("Video editor (default losslesscut):");
                             ui.text_edit_singleline(&mut self.video_editor);
                         });
+                        let _dropdown = egui::ComboBox::from_label("Default file action")
+                            .selected_text(format!("{:?}", self.default_file_action))
+                            .show_ui(ui, |ui| {
+                                ui.selectable_value(
+                                    &mut self.default_file_action,
+                                    DefaultFileAction::View,
+                                    "View",
+                                );
+                                ui.selectable_value(
+                                    &mut self.default_file_action,
+                                    DefaultFileAction::Edit,
+                                    "Edit",
+                                );
+                            });
                     });
             }
         });
@@ -553,12 +575,25 @@ impl eframe::App for ReplayManager {
                                     });
                                             if button_response.double_clicked() {
                                                 let entry_path = format!("{}", entry.display());
-
-                                                std::thread::spawn(move || {
-                                                    if let Err(e) = open::that(&entry_path) {
-                                                        eprintln!("Failed to open file: {}", e);
-                                                    };
-                                                });
+                                                match self.default_file_action {
+                                                    DefaultFileAction::View => {
+                                                        std::thread::spawn(move || {
+                                                            if let Err(e) = open::that(&entry_path) {
+                                                                eprintln!("Failed to open file: {}", e);
+                                                            };
+                                                        });
+                                                    }
+                                                    DefaultFileAction::Edit => {
+                                                        let editor = self.video_editor.clone();
+                                                        std::thread::spawn(move || {
+                                                            if let Err(e) =
+                                                                open::with(&entry_path, editor)
+                                                            {
+                                                                eprintln!("Failed to open editor: {}", e);
+                                                            };
+                                                        });
+                                                    }
+                                                }
                                             }
 
                                             if button_response.clicked() {
