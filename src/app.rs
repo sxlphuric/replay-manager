@@ -135,8 +135,6 @@ impl eframe::App for ReplayManager {
     }
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
-            // The top panel is often a good place for a menu bar:
-
             egui::MenuBar::new().ui(ui, |ui| {
                 ui.menu_button("File", |ui| {
                     if ui.button("Quit").clicked() {
@@ -281,7 +279,6 @@ impl eframe::App for ReplayManager {
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            // The central panel the region left after adding TopPanel's and SidePanel's
             ui.heading("Replay Manager");
             let replay_folder = self.replay_folder.clone().unwrap();
 
