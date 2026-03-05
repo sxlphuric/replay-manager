@@ -76,6 +76,8 @@ pub struct ReplayManager {
 
     #[serde(skip)]
     toasts: Toasts,
+
+    video_editor: String,
 }
 
 impl Default for ReplayManager {
@@ -102,6 +104,7 @@ impl Default for ReplayManager {
             catbox_litter: true,
             toasts: Toasts::default(),
             display_mode: DisplayMode::Grid,
+            video_editor: String::from("losslesscut"),
         }
     }
 }
@@ -127,7 +130,6 @@ impl eframe::App for ReplayManager {
             // The top panel is often a good place for a menu bar:
 
             egui::MenuBar::new().ui(ui, |ui| {
-                // NOTE: no File->Quit on web pages!
                 ui.menu_button("File", |ui| {
                     if ui.button("Quit").clicked() {
                         ctx.send_viewport_cmd(egui::ViewportCommand::Close);
@@ -247,6 +249,11 @@ impl eframe::App for ReplayManager {
                                     "Three days",
                                 );
                             });
+                        ui.heading("Programs");
+                        ui.horizontal(|ui| {
+                            ui.label("Video editor (default losslesscut):");
+                            ui.text_edit_singleline(&mut self.video_editor);
+                        });
                     });
             }
         });
@@ -427,11 +434,12 @@ impl eframe::App for ReplayManager {
                                             button_response.context_menu(|ui| {
                                         if ui.button("Edit").clicked() {
                                             let entry_path = format!("{}", entry.display());
+                                            let editor = self.video_editor.clone();
                                             std::thread::spawn(move || {
                                                 if let Err(e) =
-                                                    open::with(&entry_path, "losslesscut")
+                                                    open::with(&entry_path, editor)
                                                 {
-                                                    eprintln!("Failed to open losslesscut: {}", e);
+                                                    eprintln!("Failed to open editor: {}", e);
                                                 };
                                             });
                                         }
