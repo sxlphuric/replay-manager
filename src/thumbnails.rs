@@ -30,7 +30,9 @@ pub fn create<'a>(
         }
     }
 
-    let output = Command::new("ffmpeg")
+    let ffmpeg_cmd = find_ffmpeg()?;
+
+    let output = Command::new(ffmpeg_cmd)
         .arg("-hwaccel")
         .arg("auto")
         .arg("-strict")
@@ -38,7 +40,7 @@ pub fn create<'a>(
         .arg("-ss")
         .arg(thumbnail_time.to_string())
         .arg("-i")
-        .arg(format!("{}", &videopath.display()))
+        .arg(videopath)
         .arg("-frames:v")
         .arg("1")
         .arg("-pix_fmt")
@@ -60,4 +62,10 @@ pub fn create<'a>(
     }
 
     Ok(thumbnail_path)
+}
+
+fn find_ffmpeg() -> Result<String> {
+    which::which("ffmpeg")
+        .map(|path| path.to_string_lossy().to_string())
+        .map_err(|_| anyhow!("ffmpeg not found in path, please install it or add it to path"))
 }

@@ -46,7 +46,6 @@ cargo install --path .
 - Customize UI?
 - Keyboard shortcuts
 - Litterbox fallback when file too big for catbox
-- Use the thumbnail or something crate/ ez-ffmpeg when ffmpeg-next is fixed (IF POSSIBLE)
 - Possibly rewrite gpu-screen-recorder in rust :3
 - Fix light mode
 - More contrast between the top bar with the search bar and the ScrollView
