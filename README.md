@@ -13,6 +13,8 @@ It can go in a folder you specify, and will list all the files with a specific f
 |_ rust.yml - workflow for Cargo tests
 test - files for test workflows
 |_ bounce.webm - test video for thumbnail test
+assets - program assets
+|_ icon_256.png - program icon (256x256px)
 src
 |_ app.rs - the egui app
 |_ main.rs - the main rust code that just launches the egui app
