@@ -3,6 +3,7 @@ use anyhow::{Error, Result, anyhow};
 use catbox;
 use eframe::egui::{self, Color32};
 use egui_file_dialog::FileDialog;
+use egui_material_icons;
 use egui_notify::Toasts;
 use glob::glob;
 use std::{path::PathBuf, process::Command, sync::mpsc, time::Duration};
@@ -108,11 +109,7 @@ impl Default for ReplayManager {
 impl ReplayManager {
     /// Called once before the first frame.
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
-        // This is also where you can customize the look and feel of egui using
-        // `cc.egui_ctx.set_visuals` and `cc.egui_ctx.set_fonts`.
-
-        // Load previous app state (if any).
-        // Note that you must enable the `persistence` feature for this to work.
+        egui_material_icons::initialize(&cc.egui_ctx);
         if let Some(storage) = cc.storage {
             eframe::get_value(storage, eframe::APP_KEY).unwrap_or_default()
         } else {
@@ -666,21 +663,16 @@ impl eframe::App for ReplayManager {
                                                     }
                                                     CatboxUploadState::Done(link) => {
                                                         ui.label("Upload finished!");
-                                                        self.toasts
-                                                            .success("Catbox upload finished")
-                                                            .duration(Duration::from_secs(5));
                                                         if self.catbox_litter {
                                                             ui.strong(format!(
-                                                            "Your file will be deleted after {}",
-                                                            litter_time
-                                                        ));
+                                                                "Your file will be deleted after {}.",
+                                                                litter_time
+                                                            ));
                                                         }
-                                                        ui.horizontal(|ui| {
-                                                            ui.hyperlink(link);
-                                                            if ui.button("Copy").clicked() {
-                                                                ui.ctx().copy_text(link.clone());
-                                                            }
-                                                        });
+                                                        if ui.hyperlink(format!("{} {}", link, egui_material_icons::icons::ICON_CONTENT_COPY)).clicked() {
+                                                            ui.ctx().copy_text(link.clone());
+                                                            self.toasts.info("Copied file link to clipboard").duration(Duration::from_secs(2));
+                                                        };
                                                         if ui.button("Ok").clicked() {
                                                             self.catbox_popup = None;
                                                         }
