@@ -5,7 +5,7 @@ use eframe::egui::{self, Color32};
 use egui_file_dialog::FileDialog;
 use egui_material_icons;
 use egui_notify::Toasts;
-use glob::glob;
+use glob::{MatchOptions, glob_with};
 use std::{path::PathBuf, process::Command, sync::mpsc, time::Duration};
 
 #[derive(PartialEq, serde::Deserialize, serde::Serialize)]
@@ -301,12 +301,19 @@ impl eframe::App for ReplayManager {
                 self.error = Some(Err(anyhow!("Replay folder does not exist (is None)")))
             }
 
-            let replays_glob = glob(&format!(
-                "{}/**/{}*.{}",
+            let replays_pattern = format!(
+                "{}/{}*.{}",
                 replay_folder.to_string_lossy(),
                 self.replay_prefix,
                 self.replay_format
-            ));
+            );
+
+            let replays_glob_options = MatchOptions {
+                require_literal_leading_dot: true,
+                ..Default::default()
+            };
+
+            let replays_glob = glob_with(&replays_pattern, replays_glob_options);
 
             if replays_glob.is_ok() {
                 self.replays = replays_glob.unwrap().filter_map(|e| e.ok()).collect();
@@ -399,10 +406,7 @@ impl eframe::App for ReplayManager {
                                 if thumbnail_path_result.is_ok() {
                                     thumbnail_path = thumbnail_path_result.unwrap()
                                 } else {
-                                    self.error = Some(Err(anyhow!(format!(
-                                        "{}",
-                                        thumbnail_path_result.unwrap_err()
-                                    ))));
+                                    self.toasts.error(format!("Could not get thumbnail for {}",entry.file_stem().unwrap().display()));
                                 }
 
                                 let thumbnail_image = egui::Image::from_uri(format!(
@@ -722,10 +726,7 @@ impl eframe::App for ReplayManager {
                                             },
                                         );
                                     }
-                                    if self.error.is_some() {
-                                        self.toasts
-                                            .error("An error occured")
-                                            .duration(Duration::from_secs(5));
+                                    /*if self.error.is_some() {
                                         egui::Modal::new(egui::Id::new(i)).show(
                                             ctx,
                                             |ui: &mut egui::Ui| {
@@ -746,7 +747,7 @@ impl eframe::App for ReplayManager {
                                                 });
                                             },
                                         );
-                                    }
+                                    }*/
 
                                     row_reset += 1;
                                 }
