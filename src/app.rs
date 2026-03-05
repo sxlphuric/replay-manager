@@ -15,6 +15,12 @@ enum Sorting {
     Size,
 }
 
+#[derive(PartialEq, serde::Deserialize, serde::Serialize)]
+enum DisplayMode {
+    List,
+    Grid,
+}
+
 #[derive(PartialEq, Debug, serde::Deserialize, serde::Serialize)]
 enum LitterboxUploadTime {
     OneHour,
@@ -37,6 +43,7 @@ pub struct ReplayManager {
     replay_folder: Option<PathBuf>,
     replay_format: String,
     replay_prefix: String,
+    display_mode: DisplayMode,
 
     #[serde(skip)]
     delete_popup: Option<usize>,
@@ -93,6 +100,7 @@ impl Default for ReplayManager {
             litterbox_upload_time: LitterboxUploadTime::ThreeDays,
             catbox_litter: true,
             toasts: Toasts::default(),
+            display_mode: DisplayMode::Grid,
         }
     }
 }
@@ -145,6 +153,10 @@ impl eframe::App for ReplayManager {
                         );
                         ui.radio_value(&mut self.sort_order, Sorting::Name, "Name");
                         ui.radio_value(&mut self.sort_order, Sorting::Size, "File Size");
+                    });
+                    ui.menu_button("Display...", |ui| {
+                        ui.radio_value(&mut self.display_mode, DisplayMode::Grid, "Grid");
+                        ui.radio_value(&mut self.display_mode, DisplayMode::List, "List");
                     });
                     ui.menu_button("Order", |ui| {
                         if ui.radio(self.ascending, "Ascending").clicked() {
@@ -302,35 +314,40 @@ impl eframe::App for ReplayManager {
             let replay_count = self.replays.iter().count();
             let replay_enumerate = self.replays.iter().enumerate();
             let min_col_width = 160.0;
+            let min_col_height = match self.display_mode {
+                DisplayMode::Grid => 120.0,
+                DisplayMode::List => 60.0,
+            };
             let grid_spacing = egui::Vec2::new(
                 // ui.available_width() - column_count as f32 * min_col_width,
                 10.0, 10.0,
             );
             let ui_minus_spacing = ui.available_width(); //- 2.0*grid_spacing.x - ui.style().spacing.window_margin.left as f32 - ui.style().spacing.window_margin.right as f32 / min_col_width;
-            let column_count = (ui_minus_spacing / min_col_width).floor() as usize;
+            let column_count = match self.display_mode {
+                DisplayMode::Grid => (ui_minus_spacing / min_col_width).floor() as usize,
+                DisplayMode::List => 1usize,
+            };
 
             let mut row_reset = 0;
-            let image_size = egui::Vec2::new(160.0, 120.0);
+            let image_size = match self.display_mode {
+                DisplayMode::Grid => egui::Vec2::new(160.0, 120.0),
+                DisplayMode::List => egui::Vec2::new(80.0, 60.0),
+            };
 
             ui.style_mut().visuals.widgets.hovered.weak_bg_fill = Color32::DARK_GRAY;
             ui.style_mut().visuals.widgets.active.weak_bg_fill = Color32::LIGHT_BLUE;
             ui.style_mut().spacing.item_spacing = egui::Vec2::new(8.0, 8.0);
 
-            // let replay_grid =
-            let replay_grid = egui::Grid::new("Replays")
-                .min_col_width(min_col_width)
-                .min_row_height(120.0)
-                .spacing(grid_spacing);
-
             egui::ScrollArea::vertical()
                 .max_width(ui.available_width())
                 .show(ui, |ui| {
                     ui.set_width(ui.available_width());
-                    /*self.infinite_scroll.ui(ui, 10, |ui, _index, item| {
-                        ui.label(format!("Item: {item}"));
-                    });*/
-                    ui.vertical_centered_justified(|ui| {
-                        replay_grid.show(ui, |ui| -> Result<()> {
+                    egui::Grid::new("Replays")
+                        .min_col_width(min_col_width)
+                        .min_row_height(min_col_height)
+                        .num_columns(column_count)
+                        .spacing(grid_spacing)
+                        .show(ui, |ui| -> Result<()> {
                             for (i, entry) in replay_enumerate {
                                 let thumbnail_path_result = thumbnails::create(
                                     &entry,
@@ -368,169 +385,186 @@ impl eframe::App for ReplayManager {
                                     .to_lowercase()
                                     .contains(&self.search_query.to_lowercase())
                                 {
-                                    let button = egui::Button::image(thumbnail_image)
-                                        .min_size(image_size)
-                                        .frame_when_inactive(false);
+                                    let button = match self.display_mode {
+                                        DisplayMode::Grid => egui::Button::image(thumbnail_image)
+                                            .min_size(image_size)
+                                            .frame_when_inactive(false),
+                                        DisplayMode::List => egui::Button::image_and_text(
+                                            thumbnail_image,
+                                            file_stem.to_string_lossy(),
+                                        )
+                                        .min_size(egui::Vec2::new(
+                                            ui.available_width(),
+                                            image_size.y,
+                                        ))
+                                        .frame_when_inactive(false),
+                                    };
                                     let label = egui::Label::new(format!(
                                         "{}",
                                         file_stem.to_string_lossy(),
                                     ))
                                     .halign(egui::Align::Center);
 
-                                    ui.vertical(|ui| -> Result<()> {
-                                        let button_response = ui.add(button);
-                                        button_response.context_menu(|ui| {
-                                            if ui.button("Edit").clicked() {
-                                                let entry_path = format!("{}", entry.display());
-                                                std::thread::spawn(move || {
-                                                                                                    if let Err(e) = open::with(&entry_path,"losslesscut") {
-                                                                                                        eprintln!("Failed to open losslesscut: {}", e);
-                                                                                                    };
-                                                                                                });
+                                    let button_ui =
+                                        |ui: &mut egui::Ui| -> Result<()> {
+                                            let button_response = ui.add(button);
+                                            if self.display_mode == DisplayMode::Grid {
+                                                ui.add(label);
                                             }
-                                            if ui.button("View").clicked() {
+                                            button_response.context_menu(|ui| {
+                                        if ui.button("Edit").clicked() {
+                                            let entry_path = format!("{}", entry.display());
+                                            std::thread::spawn(move || {
+                                                if let Err(e) =
+                                                    open::with(&entry_path, "losslesscut")
+                                                {
+                                                    eprintln!("Failed to open losslesscut: {}", e);
+                                                };
+                                            });
+                                        }
+                                        if ui.button("View").clicked() {
+                                            let entry_path = format!("{}", entry.display());
+                                            std::thread::spawn(move || {
+                                                if let Err(e) = open::that(&entry_path) {
+                                                    eprintln!("Failed to open file: {}", e);
+                                                };
+                                            });
+                                        }
+                                        if ui.button("Delete").clicked() {
+                                            self.delete_popup = Some(i);
+                                        }
+                                        if ui.button("Save to Catbox").clicked() {
+                                            self.catbox_upload_state = CatboxUploadState::Uploading;
+
+                                            let entry_path = format!("{}", entry.display());
+                                            let tx = self.catbox_upload_send.clone();
+                                            let ctx = ctx.clone();
+
+                                            if self.catbox_litter {
+                                                match self.litterbox_upload_time {
+                                                    LitterboxUploadTime::OneHour => {
+                                                        std::thread::spawn(move || {
+                                                            let rt = tokio::runtime::Runtime::new()
+                                                                .unwrap();
+
+                                                            let result = rt.block_on(async {
+                                                                catbox::litter::upload(
+                                                                    entry_path, 1,
+                                                                )
+                                                                .await
+                                                            });
+                                                            let _ = tx.send(
+                                                                result.map_err(|e| e.to_string()),
+                                                            );
+                                                            ctx.request_repaint();
+                                                        });
+                                                    }
+                                                    LitterboxUploadTime::TwelveHours => {
+                                                        std::thread::spawn(move || {
+                                                            let rt = tokio::runtime::Runtime::new()
+                                                                .unwrap();
+
+                                                            let result = rt.block_on(async {
+                                                                catbox::litter::upload(
+                                                                    entry_path, 12,
+                                                                )
+                                                                .await
+                                                            });
+                                                            let _ = tx.send(
+                                                                result.map_err(|e| e.to_string()),
+                                                            );
+                                                            ctx.request_repaint();
+                                                        });
+                                                    }
+                                                    LitterboxUploadTime::OneDay => {
+                                                        std::thread::spawn(move || {
+                                                            let rt = tokio::runtime::Runtime::new()
+                                                                .unwrap();
+
+                                                            let result = rt.block_on(async {
+                                                                catbox::litter::upload(
+                                                                    entry_path, 24,
+                                                                )
+                                                                .await
+                                                            });
+                                                            let _ = tx.send(
+                                                                result.map_err(|e| e.to_string()),
+                                                            );
+                                                            ctx.request_repaint();
+                                                        });
+                                                    }
+                                                    LitterboxUploadTime::ThreeDays => {
+                                                        std::thread::spawn(move || {
+                                                            let rt = tokio::runtime::Runtime::new()
+                                                                .unwrap();
+
+                                                            let result = rt.block_on(async {
+                                                                catbox::litter::upload(
+                                                                    entry_path, 72,
+                                                                )
+                                                                .await
+                                                            });
+                                                            let _ = tx.send(
+                                                                result.map_err(|e| e.to_string()),
+                                                            );
+                                                            ctx.request_repaint();
+                                                        });
+                                                    }
+                                                }
+                                            } else {
+                                                std::thread::spawn(move || {
+                                                    let rt =
+                                                        tokio::runtime::Runtime::new().unwrap();
+
+                                                    let result = rt.block_on(async {
+                                                        catbox::file::from_file(entry_path, None)
+                                                            .await
+                                                    });
+
+                                                    let _ =
+                                                        tx.send(result.map_err(|e| e.to_string()));
+                                                    ctx.request_repaint();
+                                                });
+                                            }
+
+                                            self.catbox_popup = Some(i);
+                                        }
+                                    });
+                                            if button_response.double_clicked() {
                                                 let entry_path = format!("{}", entry.display());
+
                                                 std::thread::spawn(move || {
                                                     if let Err(e) = open::that(&entry_path) {
                                                         eprintln!("Failed to open file: {}", e);
                                                     };
                                                 });
                                             }
-                                            if ui.button("Delete").clicked() {
-                                                self.delete_popup = Some(i);
+
+                                            if button_response.clicked() {
+                                                button_response.request_focus();
                                             }
-                                            if ui.button("Save to Catbox").clicked() {
-                                                self.catbox_upload_state =
-                                                    CatboxUploadState::Uploading;
 
-                                                let entry_path = format!("{}", entry.display());
-                                                let tx = self.catbox_upload_send.clone();
-                                                let ctx = ctx.clone();
-
-                                                if self.catbox_litter {
-                                                    match self.litterbox_upload_time {
-                                                        LitterboxUploadTime::OneHour => {
-                                                            std::thread::spawn(move || {
-                                                                let rt =
-                                                                    tokio::runtime::Runtime::new()
-                                                                        .unwrap();
-
-                                                                let result = rt.block_on(async {
-                                                                    catbox::litter::upload(
-                                                                        entry_path, 1,
-                                                                    )
-                                                                    .await
-                                                                });
-                                                                let _ = tx
-                                                                    .send(result.map_err(|e| {
-                                                                        e.to_string()
-                                                                    }));
-                                                                ctx.request_repaint();
-                                                            });
-                                                        }
-                                                        LitterboxUploadTime::TwelveHours => {
-                                                            std::thread::spawn(move || {
-                                                                let rt =
-                                                                    tokio::runtime::Runtime::new()
-                                                                        .unwrap();
-
-                                                                let result = rt.block_on(async {
-                                                                    catbox::litter::upload(
-                                                                        entry_path, 12,
-                                                                    )
-                                                                    .await
-                                                                });
-                                                                let _ = tx
-                                                                    .send(result.map_err(|e| {
-                                                                        e.to_string()
-                                                                    }));
-                                                                ctx.request_repaint();
-                                                            });
-                                                        }
-                                                        LitterboxUploadTime::OneDay => {
-                                                            std::thread::spawn(move || {
-                                                                let rt =
-                                                                    tokio::runtime::Runtime::new()
-                                                                        .unwrap();
-
-                                                                let result = rt.block_on(async {
-                                                                    catbox::litter::upload(
-                                                                        entry_path, 24,
-                                                                    )
-                                                                    .await
-                                                                });
-                                                                let _ = tx
-                                                                    .send(result.map_err(|e| {
-                                                                        e.to_string()
-                                                                    }));
-                                                                ctx.request_repaint();
-                                                            });
-                                                        }
-                                                        LitterboxUploadTime::ThreeDays => {
-                                                            std::thread::spawn(move || {
-                                                                let rt =
-                                                                    tokio::runtime::Runtime::new()
-                                                                        .unwrap();
-
-                                                                let result = rt.block_on(async {
-                                                                    catbox::litter::upload(
-                                                                        entry_path, 72,
-                                                                    )
-                                                                    .await
-                                                                });
-                                                                let _ = tx
-                                                                    .send(result.map_err(|e| {
-                                                                        e.to_string()
-                                                                    }));
-                                                                ctx.request_repaint();
-                                                            });
-                                                        }
-                                                    }
-                                                } else {
-                                                    std::thread::spawn(move || {
-                                                        let rt =
-                                                            tokio::runtime::Runtime::new().unwrap();
-
-                                                        let result = rt.block_on(async {
-                                                            catbox::file::from_file(
-                                                                entry_path, None,
-                                                            )
-                                                            .await
-                                                        });
-
-                                                        let _ = tx.send(
-                                                            result.map_err(|e| e.to_string()),
-                                                        );
-                                                        ctx.request_repaint();
-                                                    });
-                                                }
-
-                                                self.catbox_popup = Some(i);
+                                            if i == replay_count - 1 && !self.loading_done {
+                                                self.toasts
+                                                    .success(format!(
+                                                        "Finished loading {} replays",
+                                                        replay_count
+                                                    ))
+                                                    .duration(Duration::from_secs(5));
+                                                self.loading_done = true
                                             }
-                                        });
-                                        if button_response.double_clicked() {
-                                            let entry_path = format!("{}", entry.display());
 
-                                            std::thread::spawn(move || {
-                                                                                                if let Err(e) = open::that(&entry_path) {
-                                                                                                    eprintln!("Failed to open file: {}", e);
-                                                                                                };
-                                                                                            });
+                                            Ok(())
+                                        };
+
+                                    match self.display_mode {
+                                        DisplayMode::Grid => {
+                                            ui.vertical(button_ui);
                                         }
-
-                                        if button_response.clicked() {
-                                            button_response.request_focus();
+                                        DisplayMode::List => {
+                                            ui.horizontal(button_ui);
                                         }
-
-                                        if i == replay_count - 1 && !self.loading_done {
-                                            self.toasts.success(format!("Finished loading {} replays",replay_count)).duration(Duration::from_secs(5));
-                                            self.loading_done = true
-                                        }
-
-                                        ui.add(label);
-
-                                        Ok(())
-                                    });
+                                    }
 
                                     if self.delete_popup == Some(i) {
                                         egui::Modal::new(egui::Id::new(i)).show(
@@ -543,7 +577,9 @@ impl eframe::App for ReplayManager {
                                                     "Are you sure you want to delete {}?",
                                                     entry.display()
                                                 ));
-                                                ui.strong("This is permanent and cannot be undone.");
+                                                ui.strong(
+                                                    "This is permanent and cannot be undone.",
+                                                );
 
                                                 ui.horizontal(|ui| {
                                                     if ui.button("Yes").clicked() {
@@ -552,7 +588,15 @@ impl eframe::App for ReplayManager {
                                                             .arg(format!("{}", entry.display()))
                                                             .spawn();
                                                         // [TODO] error handling for file stem
-                                                        self.toasts.success(format!("Deleted {}", entry.file_stem().unwrap().display())).duration(Duration::from_secs(5));
+                                                        self.toasts
+                                                            .success(format!(
+                                                                "Deleted {}",
+                                                                entry
+                                                                    .file_stem()
+                                                                    .unwrap()
+                                                                    .display()
+                                                            ))
+                                                            .duration(Duration::from_secs(5));
                                                         self.delete_popup = None;
                                                     }
                                                     if ui.button("No").clicked() {
@@ -583,8 +627,8 @@ impl eframe::App for ReplayManager {
                                                             ui.spinner();
                                                         });
                                                         if ui.button("Close").clicked() {
-                                                                                                               self.catbox_popup = None;
-                                                                                                           }
+                                                            self.catbox_popup = None;
+                                                        }
                                                     }
                                                     &CatboxUploadState::Uploading => {
                                                         ui.horizontal(|ui| {
@@ -592,8 +636,8 @@ impl eframe::App for ReplayManager {
                                                             ui.label("Sending file to Catbox");
                                                         });
                                                         if ui.button("Cancel").clicked() {
-                                                                                                               self.catbox_popup = None;
-                                                                                                           }
+                                                            self.catbox_popup = None;
+                                                        }
                                                     }
                                                     CatboxUploadState::Error(error) => {
                                                         ui.colored_label(
@@ -601,18 +645,19 @@ impl eframe::App for ReplayManager {
                                                             format!("Error: {}", error),
                                                         );
                                                         if ui.button("Cancel").clicked() {
-                                                                                                               self.catbox_popup = None;
-                                                                                                           }
+                                                            self.catbox_popup = None;
+                                                        }
                                                     }
                                                     CatboxUploadState::Done(link) => {
                                                         ui.label("Upload finished!");
-                                                        self.toasts.success("Catbox upload finished").duration(Duration::from_secs(5));
+                                                        self.toasts
+                                                            .success("Catbox upload finished")
+                                                            .duration(Duration::from_secs(5));
                                                         if self.catbox_litter {
-
                                                             ui.strong(format!(
-                                                                                                                        "Your file will be deleted after {}",
-                                                                                                                        litter_time
-                                                                                                                    ));
+                                                            "Your file will be deleted after {}",
+                                                            litter_time
+                                                        ));
                                                         }
                                                         ui.horizontal(|ui| {
                                                             ui.hyperlink(link);
@@ -621,15 +666,17 @@ impl eframe::App for ReplayManager {
                                                             }
                                                         });
                                                         if ui.button("Ok").clicked() {
-                                                                                                               self.catbox_popup = None;
-                                                                                                           }
+                                                            self.catbox_popup = None;
+                                                        }
                                                     }
                                                 }
-                                                                                               },
+                                            },
                                         );
                                     }
                                     if self.error.is_some() {
-                                        self.toasts.error("An error occured").duration(Duration::from_secs(5));
+                                        self.toasts
+                                            .error("An error occured")
+                                            .duration(Duration::from_secs(5));
                                         egui::Modal::new(egui::Id::new(i)).show(
                                             ctx,
                                             |ui: &mut egui::Ui| {
@@ -662,7 +709,6 @@ impl eframe::App for ReplayManager {
                             }
                             Ok(())
                         });
-                    });
                 });
         });
 
