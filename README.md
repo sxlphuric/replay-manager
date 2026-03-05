@@ -60,6 +60,8 @@ cargo install --path .
 - Change catbox uploads to allow multiple uploads at the same time
 - Working tests
 - Use a toast instead of a scary modal to show errors
+- Add whether to hide hidden files as an option
+- Find a way to make the toasts not stay on the screen (put them outside of the for loop?)
 ## Roadmap
 - [ ] Fix light mode
 - [ ] Optimize
@@ -70,5 +72,5 @@ cargo install --path .
 - [ ] Cross-platform support
   - [x] Linux
   - [x] MacOS
-  - [ ] Windows 
+  - [ ] Windows
 - [ ] Logging with [tracing](https://docs.rs/tracing)
