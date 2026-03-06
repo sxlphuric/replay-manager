@@ -1,6 +1,6 @@
 use crate::{thumbnails, videoutils};
 use anyhow::{Result, anyhow};
-use eframe::egui::{self, Color32};
+use eframe::egui::{self, Color32, Key, KeyboardShortcut, Modifiers};
 use egui_file_dialog::FileDialog;
 use egui_notify::Toasts;
 use glob::{MatchOptions, glob_with};
@@ -97,6 +97,13 @@ pub struct ReplayManager {
     new_folder: bool,
 
     show_hidden_files: bool,
+
+    settings_shortcut: egui::KeyboardShortcut,
+    edit_shortcut: egui::KeyboardShortcut,
+    view_shortcut: egui::KeyboardShortcut,
+    delete_shortcut: egui::KeyboardShortcut,
+
+    input_state: egui::InputState,
 }
 
 impl Default for ReplayManager {
@@ -136,6 +143,11 @@ impl Default for ReplayManager {
             thumb_errors: std::collections::HashSet::new(),
             new_folder: true,
             show_hidden_files: false,
+            settings_shortcut: KeyboardShortcut::new(Modifiers::ALT, Key::S),
+            edit_shortcut: KeyboardShortcut::new(Modifiers::SHIFT, Key::E),
+            view_shortcut: KeyboardShortcut::new(Modifiers::SHIFT, Key::O),
+            delete_shortcut: KeyboardShortcut::new(Modifiers::NONE, Key::Delete),
+            input_state: egui::InputState::default(),
         }
     }
 }
@@ -185,6 +197,10 @@ impl eframe::App for ReplayManager {
                 }
             }
             ctx.request_repaint();
+        }
+
+        if ctx.input_mut(|i| i.consume_shortcut(&self.settings_shortcut)) {
+            self.settings_popup = !self.settings_popup
         }
 
         ctx.request_repaint_after(Duration::from_millis(100));
