@@ -700,10 +700,10 @@ impl eframe::App for ReplayManager {
                                                 });
                                             };
                                             button_response.context_menu(|ui| {
-                                                let edit_button = egui::Button::new("Edit").shortcut_text(&self.edit_shortcut.format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos")));
-                                                let view_button = egui::Button::new("View").shortcut_text(&self.view_shortcut.format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos")));
-                                                let delete_button = egui::Button::new("Delete").shortcut_text(&self.delete_shortcut.format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos")));
-                                                let catbox_button = egui::Button::new("Save to Catbox").shortcut_text(&self.catbox_shortcut.format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos")));
+                                                let edit_button = egui::Button::new("Edit").shortcut_text(self.edit_shortcut.format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos")));
+                                                let view_button = egui::Button::new("View").shortcut_text(self.view_shortcut.format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos")));
+                                                let delete_button = egui::Button::new("Delete").shortcut_text(self.delete_shortcut.format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos")));
+                                                let catbox_button = egui::Button::new("Save to Catbox").shortcut_text(self.catbox_shortcut.format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos")));
                                                 let edit_button_response = ui.add(edit_button);
                                                 let view_button_response = ui.add(view_button);
                                                 let delete_button_response = ui.add(delete_button);
