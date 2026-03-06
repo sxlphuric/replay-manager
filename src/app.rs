@@ -497,7 +497,7 @@ impl eframe::App for ReplayManager {
                 .collect();
 
             let total_rows = (replays_filtered.len() + column_count - 1).max(1) / column_count;
-            let row_height = image_size.y + 24.0 + grid_spacing.y; // image + label + spacing
+            let row_height = image_size.y + 24.0 + grid_spacing.y; // label height is 24
 
             egui::ScrollArea::both()
                 .max_width(ui.available_width())
