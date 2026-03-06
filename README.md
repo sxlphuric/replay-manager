@@ -66,7 +66,6 @@ cargo install --path .
 - Working tests
 - Use a toast instead of a scary modal to show errors
 - Add whether to hide hidden files as an option
-- Find a way to make the toasts not stay on the screen (put them outside of the for loop?)
 ## Roadmap
 - [ ] Fix light mode
 - [x] Optimize
