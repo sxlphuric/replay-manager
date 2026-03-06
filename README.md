@@ -61,6 +61,7 @@ cargo install --path .
 - Add side panel for catbox file send operations
 - Change catbox uploads to allow multiple uploads at the same time
 - Working tests
+- Add option to loop recursively in subfolders to find replays
 ## Roadmap
 - [ ] Fix light mode
 - [x] Optimize
