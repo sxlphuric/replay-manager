@@ -55,7 +55,6 @@ cargo install --path .
 
 ## TODO
 - Catbox authentication with user token
-- Better search bar (make full screen width)
 - Litterbox fallback when file too big for catbox
 - Possibly rewrite gpu-screen-recorder in rust :3
 - Fix light mode
