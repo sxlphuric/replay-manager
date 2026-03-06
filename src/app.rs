@@ -90,8 +90,9 @@ pub struct ReplayManager {
     thumb_send: mpsc::Sender<(PathBuf, Result<PathBuf>)>,
     #[serde(skip)]
     thumb_queue: std::collections::HashSet<PathBuf>,
-    #[serde(skip)]
     thumb_cache: std::collections::HashMap<PathBuf, PathBuf>,
+    #[serde(skip)]
+    thumb_errors: std::collections::HashSet<PathBuf>,
 
     video_editor: String,
 }
@@ -131,6 +132,7 @@ impl Default for ReplayManager {
             thumb_send: thumb_tx,
             thumb_queue: std::collections::HashSet::new(),
             thumb_cache: std::collections::HashMap::new(),
+            thumb_errors: std::collections::HashSet::new(),
         }
     }
 }
@@ -139,11 +141,20 @@ impl ReplayManager {
     /// Called once before the first frame.
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         egui_material_icons::initialize(&cc.egui_ctx);
-        if let Some(storage) = cc.storage {
+        let mut repman: Self = if let Some(storage) = cc.storage {
             eframe::get_value(storage, eframe::APP_KEY).unwrap_or_default()
         } else {
             Default::default()
-        }
+        };
+
+        repman
+            .thumb_cache
+            .retain(|_video_path, thumb_path| thumb_path.exists());
+        repman
+            .thumb_cache
+            .retain(|video_path, _thumb_path| video_path.exists());
+
+        repman
     }
 }
 
@@ -157,10 +168,12 @@ impl eframe::App for ReplayManager {
                 Ok(thumb_path) => {
                     self.thumb_cache.insert(replay_path, thumb_path);
                 }
-                Err(_) => {
+                Err(err) => {
                     self.toasts
                         .error(format!("Could not get thumbnail"))
                         .duration(Duration::from_secs(5));
+                    eprintln!("Could not get thumbnail: {}", err);
+                    self.thumb_errors.insert(replay_path);
                 }
             }
             ctx.request_repaint();
@@ -427,7 +440,7 @@ impl eframe::App for ReplayManager {
                         .spacing(grid_spacing)
                         .show(ui, |ui| -> Result<()> {
                             for (i, entry) in replay_enumerate {
-                                if !self.thumb_queue.contains(entry) {
+                                if !self.thumb_queue.contains(entry) && !self.thumb_cache.contains_key(entry) {
                                     self.thumb_queue.insert(entry.clone());
 
                                     let entry = entry.clone();
@@ -445,18 +458,55 @@ impl eframe::App for ReplayManager {
                                         let _ = tx.send((entry, result));
                                     });
                                 }
+                                if self.thumb_errors.contains(entry) {
+                                                                                                    ui.vertical(|ui| {
 
-                                let thumbnail_path = self.thumb_cache.get(entry).cloned().unwrap_or_default();
+                                                                                                        egui::Frame::default()
+                                                                                                                                                .fill(Color32::DARK_RED)
+                                                                                                                                                .corner_radius(5.0)
+                                                                                                                                                .show(ui, |ui|{
+                                                                                                                                                    ui.set_width(image_size.x);
+                                                                                                                                                    ui.set_height(image_size.y);
+                                                                                                                                                    ui.centered_and_justified(|ui| {
+                                                                                                                                                        ui.colored_label(Color32::WHITE, "Could not load thumbnail")
+                                                                                                                                                    })
+                                                                                                                                                });
 
-                                let thumbnail_image = if let Some(thumb_path) = self.thumb_cache.get(entry) {
+                                                                                                                                            ui.label(entry.to_string_lossy());
+                                                                                                    });
+
+                                                                                                    continue;
+                                                                                                }
+
+                                if !self.thumb_cache.contains_key(entry) {
+                                    ui.vertical(|ui| {
+
+                                        egui::Frame::default()
+                                                                                .fill(Color32::DARK_GRAY)
+                                                                                .corner_radius(5.0)
+                                                                                .show(ui, |ui|{
+                                                                                    ui.set_width(image_size.x);
+                                                                                    ui.set_height(image_size.y);
+                                                                                    ui.centered_and_justified(|ui| {
+                                                                                        ui.spinner();
+                                                                                    })
+                                                                                });
+
+                                                                            ui.label(entry.to_string_lossy());
+                                    });
+
+                                    continue;
+                                }
+
+                                                                let thumbnail_path = self.thumb_cache.get(entry).cloned().unwrap_or_default();
+
+                                let thumbnail_image =
                                     egui::Image::from_uri(format!(
                                         "file://{}",
                                         thumbnail_path.display()
                                     ))
                                     .fit_to_exact_size(image_size) // original res 640x480
-                                    .corner_radius(5) } else {
-                                        egui::Image::from_uri("file://../assets/icon_256.png").fit_to_exact_size(image_size)
-                                    };
+                                    .corner_radius(5);
 
                                 let file_stem_opt = entry.file_stem();
                                 let file_stem: &std::ffi::OsStr;
@@ -647,7 +697,7 @@ impl eframe::App for ReplayManager {
                                             if i == replay_count - 1 && !self.loading_done {
                                                 self.toasts
                                                     .success(format!(
-                                                        "Finished loading {} replays",
+                                                        "Finished loading {} replay",
                                                         replay_count
                                                     ))
                                                     .duration(Duration::from_secs(5));
