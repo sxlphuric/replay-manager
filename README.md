@@ -75,7 +75,7 @@ cargo install --path .
 - [ ] Polish
 - [ ] Keyboard shortcuts
 - [ ] Catbox authentication
-- [ ] Thumbnail generation multithreading
+- [x] Thumbnail generation multithreading
 - [ ] Cross-platform support
   - [x] Linux
   - [x] MacOS
