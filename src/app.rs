@@ -111,7 +111,11 @@ impl Default for ReplayManager {
             catbox_litter: true,
             toasts: Toasts::default(),
             display_mode: DisplayMode::Grid,
-            video_editor: String::from("losslesscut"),
+            video_editor: if cfg!(target_os = "windows") {
+                String::from("LosslessCut")
+            } else {
+                String::from("losslesscut")
+            },
             default_file_action: DefaultFileAction::View,
         }
     }
