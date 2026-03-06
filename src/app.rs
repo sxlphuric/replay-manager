@@ -175,7 +175,10 @@ impl eframe::App for ReplayManager {
                 }
                 Err(err) => {
                     self.toasts
-                        .error("Could not get thumbnail")
+                        .error(format!(
+                            "Could not get thumbnail for {}",
+                            replay_path.display()
+                        ))
                         .duration(Duration::from_secs(5));
                     eprintln!("Could not get thumbnail: {}", err);
                     self.thumb_errors.insert(replay_path);
@@ -779,13 +782,14 @@ impl eframe::App for ReplayManager {
                                                     "This is permanent and cannot be undone.",
                                                 );
 
-                                                ui.horizontal(|ui| {
+                                                ui.horizontal(|ui| -> Result<()> {
                                                     if ui.button("Yes").clicked() {
-                                                        let _ = Command::new("rm")
+                                                        let output = Command::new("rm")
                                                             .arg("-rf")
                                                             .arg(format!("{}", entry.display()))
-                                                            .spawn();
+                                                            .output()?;
                                                         // [TODO] error handling for file stem
+                                                        if output.status.success() {
                                                         self.toasts
                                                             .success(format!(
                                                                 "Deleted {}",
@@ -795,11 +799,15 @@ impl eframe::App for ReplayManager {
                                                                     .display()
                                                             ))
                                                             .duration(Duration::from_secs(5));
+                                                        } else {
+                                                            return Err(anyhow!("Could not delete file {}", entry.display()));
+                                                        }
                                                         self.delete_popup = None;
                                                     }
                                                     if ui.button("No").clicked() {
                                                         self.delete_popup = None;
                                                     }
+                                                    Ok(())
                                                 })
                                             },
                                         );
