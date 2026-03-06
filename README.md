@@ -57,7 +57,6 @@ cargo install --path .
 - Catbox authentication with user token
 - Better search bar (make full screen width)
 - Customize UI?
-- Keyboard shortcuts
 - Litterbox fallback when file too big for catbox
 - Possibly rewrite gpu-screen-recorder in rust :3
 - Fix light mode
@@ -68,7 +67,7 @@ cargo install --path .
 - [ ] Fix light mode
 - [x] Optimize
 - [ ] Polish
-- [ ] Keyboard shortcuts
+- [x] Keyboard shortcuts
 - [ ] Catbox authentication
 - [x] Thumbnail generation multithreading
 - [ ] Cross-platform support
