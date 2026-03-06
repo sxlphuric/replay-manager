@@ -103,6 +103,7 @@ pub struct ReplayManager {
     view_shortcut: KeyboardShortcut,
     delete_shortcut: KeyboardShortcut,
     catbox_shortcut: KeyboardShortcut,
+    search_shortcut: KeyboardShortcut,
 
     input_state: egui::InputState,
 }
@@ -149,6 +150,7 @@ impl Default for ReplayManager {
             view_shortcut: KeyboardShortcut::new(Modifiers::SHIFT, Key::O),
             delete_shortcut: KeyboardShortcut::new(Modifiers::NONE, Key::Delete),
             catbox_shortcut: KeyboardShortcut::new(Modifiers::CTRL, Key::S),
+            search_shortcut: KeyboardShortcut::new(Modifiers::CTRL, Key::F),
             input_state: egui::InputState::default(),
         }
     }
@@ -387,8 +389,14 @@ impl eframe::App for ReplayManager {
 
 
             ui.horizontal(|ui| {
-                ui.label("Search:");
-                ui.text_edit_singleline(&mut self.search_query);
+                ui.horizontal(|ui| {
+                    ui.small(self.search_shortcut.format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos")));
+                    ui.label("Search:");
+                });
+                let search_text_input = ui.text_edit_singleline(&mut self.search_query);
+                if ctx.input_mut(|i| i.consume_shortcut(&self.search_shortcut)) {
+                    search_text_input.request_focus();
+                }
                 if ui.button("Clear").clicked() {
                     self.search_query = "".to_string()
                 }
