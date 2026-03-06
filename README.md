@@ -56,7 +56,6 @@ cargo install --path .
 ## TODO
 - Catbox authentication with user token
 - Better search bar (make full screen width)
-- Fix the grid so that it resizes properly
 - Customize UI?
 - Keyboard shortcuts
 - Litterbox fallback when file too big for catbox
