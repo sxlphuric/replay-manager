@@ -697,8 +697,9 @@ impl eframe::App for ReplayManager {
                                             if i == replay_count - 1 && !self.loading_done {
                                                 self.toasts
                                                     .success(format!(
-                                                        "Finished loading {} replay",
-                                                        replay_count
+                                                        "Finished loading {} replay{}",
+                                                        replay_count,
+                                                        if replay_count > 1 { "s"} else {""}
                                                     ))
                                                     .duration(Duration::from_secs(5));
                                                 self.loading_done = true
