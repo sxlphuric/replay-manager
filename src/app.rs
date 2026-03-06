@@ -214,7 +214,15 @@ impl eframe::App for ReplayManager {
                     if ui.button("Quit").clicked() {
                         ctx.send_viewport_cmd(egui::ViewportCommand::Close);
                     }
-                    if ui.button("Settings").clicked() {
+                    if ui
+                        .add(
+                            egui::Button::new("Settings").shortcut_text(
+                                self.settings_shortcut
+                                    .format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos")),
+                            ),
+                        )
+                        .clicked()
+                    {
                         self.settings_popup = true;
                     }
                     ui.menu_button("Theme...", |ui| {
