@@ -220,7 +220,7 @@ impl eframe::App for ReplayManager {
                             )
                             .changed()
                         {
-                            self.new_folder = true
+                            self.new_folder = true;
                         };
                         if ui
                             .radio_value(
@@ -286,7 +286,6 @@ impl eframe::App for ReplayManager {
                             }
                             self.file_dialog.update(ctx);
                             if let Some(path) = self.file_dialog.take_picked() {
-                                self.loading_done = false;
                                 self.replay_folder = Some(path.to_path_buf());
                                 self.new_folder = true;
                                 self.thumb_queue.clear();
@@ -429,6 +428,7 @@ impl eframe::App for ReplayManager {
                 }
 
                 self.new_folder = false;
+                self.loading_done = false;
             }
 
 
@@ -741,7 +741,7 @@ impl eframe::App for ReplayManager {
                                                 button_response.request_focus();
                                             }
 
-                                            if i == replay_count - 1 && !self.loading_done {
+                                            if !self.new_folder && !self.loading_done {
                                                 self.toasts
                                                     .success(format!(
                                                         "Finished loading {} replay{}",
