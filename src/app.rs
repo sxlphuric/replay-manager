@@ -72,8 +72,6 @@ pub struct ReplayManager {
     catbox_upload_send: mpsc::Sender<Result<String, String>>,
     #[serde(skip)]
     settings_popup: bool,
-    #[serde(skip)]
-    error: Option<Result<(), Error>>,
 
     #[serde(skip)]
     file_dialog: FileDialog,
@@ -118,7 +116,6 @@ impl Default for ReplayManager {
             catbox_upload_send: catbox_tx,
             catbox_upload_recv: catbox_rx,
             settings_popup: false,
-            error: None,
             file_dialog: FileDialog::new(),
             litterbox_upload_time: LitterboxUploadTime::ThreeDays,
             catbox_litter: true,
@@ -380,7 +377,7 @@ impl eframe::App for ReplayManager {
             ui.separator();
 
             if self.replay_folder.is_none() {
-                self.error = Some(Err(anyhow!("Replay folder does not exist (is None)")))
+                self.toasts.error("Replay folder does not exists (is None)").duration(Duration::from_secs(5));
             }
 
             let replays_pattern = format!(
@@ -401,7 +398,7 @@ impl eframe::App for ReplayManager {
                 if let Ok(replay_paths) = replays_glob {
                     self.replays = replay_paths.filter_map(|e| e.ok()).collect();
                 } else if let Err(err) = replays_glob {
-                    self.error = Some(Err(anyhow!(format!("{}", err))));
+                    self.toasts.error(format!("Could not get replays: {}", err)).duration(Duration::from_secs(5));
                 }
 
                 match self.sort_order {
@@ -566,7 +563,7 @@ impl eframe::App for ReplayManager {
                                 if let Some(stem) = file_stem_opt {
                                     file_stem = stem;
                                 } else {
-                                    self.error = Some(Err(anyhow!(format!("{:?}", file_stem_opt))));
+                                    self.toasts.error("File stem is None").duration(Duration::from_secs(5));
                                     file_stem = std::ffi::OsStr::new("undefined");
                                 }
 
@@ -874,28 +871,6 @@ impl eframe::App for ReplayManager {
                                             },
                                         );
                                     }
-                                    /*if self.error.is_some() {
-                                        egui::Modal::new(egui::Id::new(i)).show(
-                                            ctx,
-                                            |ui: &mut egui::Ui| {
-                                                ui.set_min_width(310.0);
-
-                                                ui.heading("Error");
-
-                                                ui.colored_label(
-                                                    Color32::RED,
-                                                    // [TODO] Implement error message display
-                                                    "Error",
-                                                );
-
-                                                ui.horizontal(|ui| {
-                                                    if ui.button("Ok").clicked() {
-                                                        self.error = None;
-                                                    }
-                                                });
-                                            },
-                                        );
-                                    }*/
 
                                 }
                                 }
