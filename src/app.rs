@@ -1,9 +1,7 @@
 use crate::{thumbnails, videoutils};
 use anyhow::{Error, Result, anyhow};
-use catbox;
 use eframe::egui::{self, Color32};
 use egui_file_dialog::FileDialog;
-use egui_material_icons;
 use egui_notify::Toasts;
 use glob::{MatchOptions, glob_with};
 use std::{path::PathBuf, process::Command, sync::mpsc, time::Duration};
@@ -170,7 +168,7 @@ impl eframe::App for ReplayManager {
                 }
                 Err(err) => {
                     self.toasts
-                        .error(format!("Could not get thumbnail"))
+                        .error("Could not get thumbnail")
                         .duration(Duration::from_secs(5));
                     eprintln!("Could not get thumbnail: {}", err);
                     self.thumb_errors.insert(replay_path);
@@ -341,7 +339,7 @@ impl eframe::App for ReplayManager {
 
             ui.separator();
 
-            if !self.replay_folder.is_some() {
+            if self.replay_folder.is_none() {
                 self.error = Some(Err(anyhow!("Replay folder does not exist (is None)")))
             }
 
@@ -359,13 +357,11 @@ impl eframe::App for ReplayManager {
 
             let replays_glob = glob_with(&replays_pattern, replays_glob_options);
 
-            if replays_glob.is_ok() {
-                self.replays = replays_glob.unwrap().filter_map(|e| e.ok()).collect();
-            } else {
-                self.error = Some(Err(anyhow!(format!("{}", replays_glob.unwrap_err()))))
+            if let Ok(replay_paths) = replays_glob {
+                self.replays = replay_paths.filter_map(|e| e.ok()).collect();
+            } else if let Err(err) = replays_glob {
+                self.error = Some(Err(anyhow!(format!("{}", err))));
             }
-
-            self.replays.sort_by(|a, b| a.cmp(&b));
 
             match self.sort_order {
                 Sorting::CreationDate => self.replays.sort_by(|a, b| {
@@ -402,7 +398,7 @@ impl eframe::App for ReplayManager {
                 ctx.request_repaint();
             }
 
-            let replay_count = self.replays.iter().count();
+            let replay_count = self.replays.len();
             let replay_enumerate = self.replays.iter().enumerate();
             let min_col_width = 160.0;
             let min_col_height = match self.display_mode {
@@ -450,55 +446,49 @@ impl eframe::App for ReplayManager {
                                     std::thread::spawn(move || {
 
                                         let result = thumbnails::create(
-                                                                            &entry,
-                                                                            &folder_display,
-                                                                            true,
-                                                                            0.0,
-                                                                        );
+                                            &entry,
+                                            &folder_display,
+                                            true,
+                                            0.0,
+                                        );
                                         let _ = tx.send((entry, result));
                                     });
                                 }
                                 if self.thumb_errors.contains(entry) {
-                                                                                                    ui.vertical(|ui| {
-
-                                                                                                        egui::Frame::default()
-                                                                                                                                                .fill(Color32::DARK_RED)
-                                                                                                                                                .corner_radius(5.0)
-                                                                                                                                                .show(ui, |ui|{
-                                                                                                                                                    ui.set_width(image_size.x);
-                                                                                                                                                    ui.set_height(image_size.y);
-                                                                                                                                                    ui.centered_and_justified(|ui| {
-                                                                                                                                                        ui.colored_label(Color32::WHITE, "Could not load thumbnail")
-                                                                                                                                                    })
-                                                                                                                                                });
-
-                                                                                                                                            ui.label(entry.to_string_lossy());
-                                                                                                    });
-
-                                                                                                    continue;
-                                                                                                }
-
-                                if !self.thumb_cache.contains_key(entry) {
                                     ui.vertical(|ui| {
-
                                         egui::Frame::default()
-                                                                                .fill(Color32::DARK_GRAY)
-                                                                                .corner_radius(5.0)
-                                                                                .show(ui, |ui|{
-                                                                                    ui.set_width(image_size.x);
-                                                                                    ui.set_height(image_size.y);
-                                                                                    ui.centered_and_justified(|ui| {
-                                                                                        ui.spinner();
-                                                                                    })
-                                                                                });
-
-                                                                            ui.label(entry.to_string_lossy());
+                                            .fill(Color32::DARK_RED)
+                                            .corner_radius(5.0)
+                                            .show(ui, |ui| {
+                                                ui.set_width(image_size.x);
+                                                ui.set_height(image_size.y);
+                                                ui.centered_and_justified(|ui| {
+                                                    ui.colored_label(Color32::WHITE, "Could not load thumbnail")
+                                                });
+                                            });
+                                        ui.label(entry.to_string_lossy());
                                     });
-
                                     continue;
                                 }
 
-                                                                let thumbnail_path = self.thumb_cache.get(entry).cloned().unwrap_or_default();
+                                if !self.thumb_cache.contains_key(entry) {
+                                    ui.vertical(|ui| {
+                                        egui::Frame::default()
+                                            .fill(Color32::DARK_GRAY)
+                                            .corner_radius(5.0)
+                                            .show(ui, |ui| {
+                                                ui.set_width(image_size.x);
+                                                ui.set_height(image_size.y);
+                                                ui.centered_and_justified(|ui| {
+                                                    ui.spinner();
+                                                });
+                                            });
+                                        ui.label(entry.to_string_lossy());
+                                    });
+                                    continue;
+                                }
+
+                                let thumbnail_path = self.thumb_cache.get(entry).cloned().unwrap_or_default();
 
                                 let thumbnail_image =
                                     egui::Image::from_uri(format!(
@@ -510,8 +500,8 @@ impl eframe::App for ReplayManager {
 
                                 let file_stem_opt = entry.file_stem();
                                 let file_stem: &std::ffi::OsStr;
-                                if file_stem_opt.is_some() {
-                                    file_stem = file_stem_opt.unwrap();
+                                if let Some(stem) = file_stem_opt {
+                                    file_stem = stem;
                                 } else {
                                     self.error = Some(Err(anyhow!(format!("{:?}", file_stem_opt))));
                                     file_stem = std::ffi::OsStr::new("undefined");

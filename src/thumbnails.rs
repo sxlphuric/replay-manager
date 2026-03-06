@@ -3,31 +3,29 @@ use std::path::PathBuf;
 use std::process::Command;
 
 #[allow(dead_code)]
-pub fn create<'a>(
+pub fn create(
     videopath: &PathBuf,
-    folder: &'a str,
+    folder: &str,
     check_exists: bool,
     thumbnail_time: f64,
 ) -> Result<PathBuf> {
     let video_name = &videopath.file_stem();
-    let thumbnail_path: PathBuf;
-    if video_name.is_some() {
-        thumbnail_path = PathBuf::from(&format!(
+    let thumbnail_path = if video_name.is_some() {
+        PathBuf::from(&format!(
             "{}/.thumbnails/Thumbnail_{}.png",
             folder,
             video_name.unwrap().to_string_lossy()
-        ));
+        ))
     } else {
         return Err(anyhow!(format!("Video name is empty")));
-    }
+    };
+
     let thumbnail_dir = thumbnail_path.parent().unwrap();
     if !thumbnail_dir.exists() {
         std::fs::create_dir_all(thumbnail_dir)?;
     }
-    if check_exists {
-        if thumbnail_path.exists() {
-            return Ok(thumbnail_path);
-        }
+    if check_exists && thumbnail_path.exists() {
+        return Ok(thumbnail_path);
     }
 
     let ffmpeg_cmd = find_ffmpeg()?;
