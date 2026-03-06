@@ -64,7 +64,6 @@ cargo install --path .
 - Add side panel for catbox file send operations
 - Change catbox uploads to allow multiple uploads at the same time
 - Working tests
-- Add whether to hide hidden files as an option
 ## Roadmap
 - [ ] Fix light mode
 - [x] Optimize

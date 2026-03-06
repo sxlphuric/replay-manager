@@ -95,6 +95,8 @@ pub struct ReplayManager {
     video_editor: String,
     #[serde(skip)]
     new_folder: bool,
+
+    show_hidden_files: bool,
 }
 
 impl Default for ReplayManager {
@@ -133,6 +135,7 @@ impl Default for ReplayManager {
             thumb_cache: std::collections::HashMap::new(),
             thumb_errors: std::collections::HashSet::new(),
             new_folder: true,
+            show_hidden_files: false,
         }
     }
 }
@@ -258,7 +261,8 @@ impl eframe::App for ReplayManager {
                             self.ascending = false;
                             self.new_folder = true;
                         };
-                    })
+                    });
+                    ui.checkbox(&mut self.show_hidden_files, "Show hidden files");
                 });
                 ui.add_space(16.0);
             });
@@ -387,7 +391,8 @@ impl eframe::App for ReplayManager {
             );
 
             let replays_glob_options = MatchOptions {
-                require_literal_leading_dot: true,
+
+                require_literal_leading_dot: !self.show_hidden_files,
                 ..Default::default()
             };
 
