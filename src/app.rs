@@ -175,6 +175,10 @@ impl ReplayManager {
 
         repman.thumb_queue = repman.thumb_cache.keys().cloned().collect();
 
+        repman.file_dialog = repman
+            .file_dialog
+            .initial_directory(repman.replay_folder.clone().unwrap_or_default());
+
         repman
     }
 }
