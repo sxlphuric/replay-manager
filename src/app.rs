@@ -84,12 +84,22 @@ pub struct ReplayManager {
     #[serde(skip)]
     toasts: Toasts,
 
+    #[serde(skip)]
+    thumb_recv: mpsc::Receiver<(PathBuf, Result<PathBuf>)>,
+    #[serde(skip)]
+    thumb_send: mpsc::Sender<(PathBuf, Result<PathBuf>)>,
+    #[serde(skip)]
+    thumb_queue: std::collections::HashSet<PathBuf>,
+    #[serde(skip)]
+    thumb_cache: std::collections::HashMap<PathBuf, PathBuf>,
+
     video_editor: String,
 }
 
 impl Default for ReplayManager {
     fn default() -> Self {
-        let (tx, rx) = mpsc::channel();
+        let (catbox_tx, catbox_rx) = mpsc::channel();
+        let (thumb_tx, thumb_rx) = mpsc::channel();
         Self {
             replay_folder: Some(PathBuf::from("/home/aredfx/Videos/Replays")),
             replay_format: "mp4".to_string(),
@@ -102,8 +112,8 @@ impl Default for ReplayManager {
             ascending: false,
             search_query: "".to_string(),
             catbox_upload_state: CatboxUploadState::Idle,
-            catbox_upload_send: tx,
-            catbox_upload_recv: rx,
+            catbox_upload_send: catbox_tx,
+            catbox_upload_recv: catbox_rx,
             settings_popup: false,
             error: None,
             file_dialog: FileDialog::new(),
@@ -117,6 +127,10 @@ impl Default for ReplayManager {
                 String::from("losslesscut")
             },
             default_file_action: DefaultFileAction::View,
+            thumb_recv: thumb_rx,
+            thumb_send: thumb_tx,
+            thumb_queue: std::collections::HashSet::new(),
+            thumb_cache: std::collections::HashMap::new(),
         }
     }
 }
@@ -138,6 +152,19 @@ impl eframe::App for ReplayManager {
         eframe::set_value(storage, eframe::APP_KEY, self);
     }
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        while let Ok((replay_path, result)) = self.thumb_recv.try_recv() {
+            match result {
+                Ok(thumb_path) => {
+                    self.thumb_cache.insert(replay_path, thumb_path);
+                }
+                Err(_) => {
+                    self.toasts
+                        .error(format!("Could not get thumbnail"))
+                        .duration(Duration::from_secs(5));
+                }
+            }
+            ctx.request_repaint();
+        }
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             egui::MenuBar::new().ui(ui, |ui| {
                 ui.menu_button("File", |ui| {
@@ -400,25 +427,36 @@ impl eframe::App for ReplayManager {
                         .spacing(grid_spacing)
                         .show(ui, |ui| -> Result<()> {
                             for (i, entry) in replay_enumerate {
-                                let thumbnail_path_result = thumbnails::create(
-                                    &entry,
-                                    &format!("{}", replay_folder.display()),
-                                    true,
-                                    0.0,
-                                );
-                                let mut thumbnail_path = PathBuf::new();
-                                if thumbnail_path_result.is_ok() {
-                                    thumbnail_path = thumbnail_path_result.unwrap()
-                                } else {
-                                    self.toasts.error(format!("Could not get thumbnail for {}",entry.file_stem().unwrap().display()));
+                                if !self.thumb_queue.contains(entry) {
+                                    self.thumb_queue.insert(entry.clone());
+
+                                    let entry = entry.clone();
+                                    let folder_display = format!("{}", replay_folder.display());
+                                    let tx = self.thumb_send.clone();
+
+                                    std::thread::spawn(move || {
+
+                                        let result = thumbnails::create(
+                                                                            &entry,
+                                                                            &folder_display,
+                                                                            true,
+                                                                            0.0,
+                                                                        );
+                                        let _ = tx.send((entry, result));
+                                    });
                                 }
 
-                                let thumbnail_image = egui::Image::from_uri(format!(
-                                    "file://{}",
-                                    thumbnail_path.display()
-                                ))
-                                .fit_to_exact_size(image_size) // original res 640x480
-                                .corner_radius(5);
+                                let thumbnail_path = self.thumb_cache.get(entry).cloned().unwrap_or_default();
+
+                                let thumbnail_image = if let Some(thumb_path) = self.thumb_cache.get(entry) {
+                                    egui::Image::from_uri(format!(
+                                        "file://{}",
+                                        thumbnail_path.display()
+                                    ))
+                                    .fit_to_exact_size(image_size) // original res 640x480
+                                    .corner_radius(5) } else {
+                                        egui::Image::from_uri("file://../assets/icon_256.png").fit_to_exact_size(image_size)
+                                    };
 
                                 let file_stem_opt = entry.file_stem();
                                 let file_stem: &std::ffi::OsStr;
