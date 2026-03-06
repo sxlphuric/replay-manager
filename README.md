@@ -63,7 +63,6 @@ cargo install --path .
 - Possibly rewrite gpu-screen-recorder in rust :3
 - Fix light mode
 - Add side panel for catbox file send operations
-- Optimize, the app uses around 7% cpu at rest
 - Change catbox uploads to allow multiple uploads at the same time
 - Working tests
 - Use a toast instead of a scary modal to show errors
@@ -71,7 +70,7 @@ cargo install --path .
 - Find a way to make the toasts not stay on the screen (put them outside of the for loop?)
 ## Roadmap
 - [ ] Fix light mode
-- [ ] Optimize
+- [x] Optimize
 - [ ] Polish
 - [ ] Keyboard shortcuts
 - [ ] Catbox authentication
