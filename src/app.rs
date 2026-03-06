@@ -405,12 +405,30 @@ impl eframe::App for ReplayManager {
                     ui.small(self.search_shortcut.format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos")));
                     ui.label("Search:");
                 });
-                let search_text_input = ui.text_edit_singleline(&mut self.search_query);
+                let search_text_input_response = ui.add(egui::TextEdit::singleline(&mut self.search_query).desired_width(ui.available_width()));
+                let search_text_input_rect = &search_text_input_response.rect;
+
+                let mut draw_clear_button = || {
+                    let height = search_text_input_rect.height();
+                    let mut min = search_text_input_rect.min;
+                    let max = search_text_input_rect.max;
+                    min = egui::pos2(max.x - height, min.y);
+                    let new_rect = egui::Rect::from_min_max(min, max);
+                    let show_button = ui
+                        .put(
+                            new_rect,
+                            egui::Button::new(egui_material_icons::icons::ICON_CLEAR).frame(false)
+                        ).on_hover_cursor(egui::CursorIcon::PointingHand);
+                    if show_button.clicked() {
+                        self.search_query = "".to_string();
+                        search_text_input_response.request_focus();
+                    }
+                };
+
+                draw_clear_button();
+
                 if ctx.input_mut(|i| i.consume_shortcut(&self.search_shortcut)) {
-                    search_text_input.request_focus();
-                }
-                if ui.button("Clear").clicked() {
-                    self.search_query = "".to_string()
+                    search_text_input_response.request_focus();
                 }
             });
 
