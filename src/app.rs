@@ -1,5 +1,5 @@
 use crate::{thumbnails, videoutils};
-use anyhow::{Error, Result, anyhow};
+use anyhow::{Result, anyhow};
 use eframe::egui::{self, Color32};
 use egui_file_dialog::FileDialog;
 use egui_notify::Toasts;
