@@ -98,10 +98,11 @@ pub struct ReplayManager {
 
     show_hidden_files: bool,
 
-    settings_shortcut: egui::KeyboardShortcut,
-    edit_shortcut: egui::KeyboardShortcut,
-    view_shortcut: egui::KeyboardShortcut,
-    delete_shortcut: egui::KeyboardShortcut,
+    settings_shortcut: KeyboardShortcut,
+    edit_shortcut: KeyboardShortcut,
+    view_shortcut: KeyboardShortcut,
+    delete_shortcut: KeyboardShortcut,
+    catbox_shortcut: KeyboardShortcut,
 
     input_state: egui::InputState,
 }
@@ -147,6 +148,7 @@ impl Default for ReplayManager {
             edit_shortcut: KeyboardShortcut::new(Modifiers::SHIFT, Key::E),
             view_shortcut: KeyboardShortcut::new(Modifiers::SHIFT, Key::O),
             delete_shortcut: KeyboardShortcut::new(Modifiers::NONE, Key::Delete),
+            catbox_shortcut: KeyboardShortcut::new(Modifiers::CTRL, Key::S),
             input_state: egui::InputState::default(),
         }
     }
@@ -372,7 +374,7 @@ impl eframe::App for ReplayManager {
                                 );
                             });
                     });
-            }
+            };
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
@@ -614,126 +616,97 @@ impl eframe::App for ReplayManager {
                                             if self.display_mode == DisplayMode::Grid {
                                                 ui.add(label);
                                             }
-                                            button_response.context_menu(|ui| {
-                                        if ui.button("Edit").clicked() {
                                             let entry_path = format!("{}", entry.display());
                                             let editor = self.video_editor.clone();
-                                            std::thread::spawn(move || {
-                                                if let Err(e) =
-                                                    open::with(&entry_path, editor)
-                                                {
-                                                    eprintln!("Failed to open editor: {}", e);
-                                                };
-                                            });
-                                        }
-                                        if ui.button("View").clicked() {
-                                            let entry_path = format!("{}", entry.display());
-                                            std::thread::spawn(move || {
-                                                if let Err(e) = open::that(&entry_path) {
-                                                    eprintln!("Failed to open file: {}", e);
-                                                };
-                                            });
-                                        }
-                                        if ui.button("Delete").clicked() {
-                                            self.delete_popup = Some(i);
-                                        }
-                                        if ui.button("Save to Catbox").clicked() {
-                                            self.catbox_upload_state = CatboxUploadState::Uploading;
-
-                                            let entry_path = format!("{}", entry.display());
-                                            let tx = self.catbox_upload_send.clone();
-                                            let ctx = ctx.clone();
-
-                                            if self.catbox_litter {
-                                                match self.litterbox_upload_time {
-                                                    LitterboxUploadTime::OneHour => {
-                                                        std::thread::spawn(move || {
-                                                            let rt = tokio::runtime::Runtime::new()
-                                                                .unwrap();
-
-                                                            let result = rt.block_on(async {
-                                                                catbox::litter::upload(
-                                                                    entry_path, 1,
-                                                                )
-                                                                .await
-                                                            });
-                                                            let _ = tx.send(
-                                                                result.map_err(|e| e.to_string()),
-                                                            );
-                                                            ctx.request_repaint();
-                                                        });
-                                                    }
-                                                    LitterboxUploadTime::TwelveHours => {
-                                                        std::thread::spawn(move || {
-                                                            let rt = tokio::runtime::Runtime::new()
-                                                                .unwrap();
-
-                                                            let result = rt.block_on(async {
-                                                                catbox::litter::upload(
-                                                                    entry_path, 12,
-                                                                )
-                                                                .await
-                                                            });
-                                                            let _ = tx.send(
-                                                                result.map_err(|e| e.to_string()),
-                                                            );
-                                                            ctx.request_repaint();
-                                                        });
-                                                    }
-                                                    LitterboxUploadTime::OneDay => {
-                                                        std::thread::spawn(move || {
-                                                            let rt = tokio::runtime::Runtime::new()
-                                                                .unwrap();
-
-                                                            let result = rt.block_on(async {
-                                                                catbox::litter::upload(
-                                                                    entry_path, 24,
-                                                                )
-                                                                .await
-                                                            });
-                                                            let _ = tx.send(
-                                                                result.map_err(|e| e.to_string()),
-                                                            );
-                                                            ctx.request_repaint();
-                                                        });
-                                                    }
-                                                    LitterboxUploadTime::ThreeDays => {
-                                                        std::thread::spawn(move || {
-                                                            let rt = tokio::runtime::Runtime::new()
-                                                                .unwrap();
-
-                                                            let result = rt.block_on(async {
-                                                                catbox::litter::upload(
-                                                                    entry_path, 72,
-                                                                )
-                                                                .await
-                                                            });
-                                                            let _ = tx.send(
-                                                                result.map_err(|e| e.to_string()),
-                                                            );
-                                                            ctx.request_repaint();
-                                                        });
-                                                    }
-                                                }
-                                            } else {
+                                            let catbox_litter = self.catbox_litter;
+                                            let litter_delete_time = match self.litterbox_upload_time {
+                                                LitterboxUploadTime::OneHour => 1,
+                                                LitterboxUploadTime::TwelveHours => 12,
+                                                LitterboxUploadTime::OneDay => 24,
+                                                LitterboxUploadTime::ThreeDays => 72,
+                                            };
+                                            let open_editor = || {
+                                                let entry_path = entry_path.clone();
+                                                let editor = editor.clone();
                                                 std::thread::spawn(move || {
-                                                    let rt =
-                                                        tokio::runtime::Runtime::new().unwrap();
-
-                                                    let result = rt.block_on(async {
-                                                        catbox::file::from_file(entry_path, None)
-                                                            .await
-                                                    });
-
-                                                    let _ =
-                                                        tx.send(result.map_err(|e| e.to_string()));
-                                                    ctx.request_repaint();
+                                                    if let Err(e) = open::with(&entry_path, editor) {
+                                                        eprintln!("Failed to open editor: {}", e);
+                                                    }
                                                 });
+                                            };
+                                            let open_view = || {
+                                                let entry_path = entry_path.clone();
+                                                std::thread::spawn(move || {
+                                                    if let Err(e) = open::that(&entry_path) {
+                                                        eprintln!("Failed to open view: {}", e);
+                                                    }
+                                                });
+                                            };
+                                            let catbox_tx = self.catbox_upload_send.clone();
+                                            let catbox_ctx = ctx.clone();
+                                            let upload_catbox = || {
+                                                let entry_path = entry_path.clone();
+                                                let catbox_tx = catbox_tx.clone();
+                                                let catbox_ctx = catbox_ctx.clone();
+                                                std::thread::spawn(move|| {
+                                                    let rt = tokio::runtime::Runtime::new().unwrap();
+                                                    let result = rt.block_on(async move {
+                                                        if catbox_litter {
+                                                            catbox::litter::upload(&entry_path, litter_delete_time).await
+                                                        } else {
+                                                            catbox::file::from_file(&entry_path, None).await
+                                                        }
+                                                    });
+                                                    let _ = catbox_tx.send(result.map_err(|e| e.to_string()));
+                                                    catbox_ctx.request_repaint();
+                                                });
+                                            };
+                                            button_response.context_menu(|ui| {
+                                                let edit_button = egui::Button::new("Edit").shortcut_text(&self.edit_shortcut.format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos")));
+                                                let view_button = egui::Button::new("View").shortcut_text(&self.view_shortcut.format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos")));
+                                                let delete_button = egui::Button::new("Delete").shortcut_text(&self.delete_shortcut.format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos")));
+                                                let catbox_button = egui::Button::new("Save to Catbox").shortcut_text(&self.catbox_shortcut.format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos")));
+                                                let edit_button_response = ui.add(edit_button);
+                                                let view_button_response = ui.add(view_button);
+                                                let delete_button_response = ui.add(delete_button);
+                                                let catbox_button_response = ui.add(catbox_button);
+                                                if edit_button_response.clicked() {
+                                                    open_editor();
+                                                    self.toasts.success(format!("Opened {}", self.video_editor)).duration(Duration::from_secs(5));
+                                                }
+                                                if view_button_response.clicked() {
+                                                    open_view();
+                                                    self.toasts.success("Opened media viewer").duration(Duration::from_secs(5));
+                                                }
+                                                if delete_button_response.clicked() {
+                                                    self.delete_popup = Some(i);
+                                                }
+                                                if catbox_button_response.clicked() {
+                                                    upload_catbox();
+                                                    self.catbox_upload_state = CatboxUploadState::Uploading;
+                                                    self.catbox_popup = Some(i);
+                                                }
+                                            });
+
+                                            if button_response.has_focus() && ctx.input_mut(|i| i.consume_shortcut(&self.edit_shortcut)) {
+                                                open_editor();
+                                                self.toasts.success(format!("Opened {}", self.video_editor)).duration(Duration::from_secs(5));
+                                            }
+                                            if button_response.has_focus() && ctx.input_mut(|i| i.consume_shortcut(&self.view_shortcut)) {
+                                                open_view();
+                                                self.toasts.success("Opened media viewer").duration(Duration::from_secs(5));
+                                            }
+                                            if button_response.has_focus() && ctx.input_mut(|i| i.consume_shortcut(&self.delete_shortcut)) {
+                                                self.delete_popup = Some(i);
+                                            }
+                                            if button_response.has_focus() && ctx.input_mut(|i| i.consume_shortcut(&self.catbox_shortcut)) {
+                                                upload_catbox();
+                                                self.catbox_upload_state = CatboxUploadState::Uploading;
+                                                self.catbox_popup = Some(i);
                                             }
 
-                                            self.catbox_popup = Some(i);
-                                        }
-                                    });
+
+
                                             if button_response.double_clicked() {
                                                 let entry_path = format!("{}", entry.display());
                                                 match self.default_file_action {
@@ -897,7 +870,7 @@ impl eframe::App for ReplayManager {
                                 ui.end_row();
                             }
                         });
-                });
+                    });
         });
 
         self.toasts.show(ctx);
