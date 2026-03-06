@@ -53,6 +53,7 @@ pub struct ReplayManager {
 
     #[serde(skip)]
     delete_popup: Option<usize>,
+    #[serde(skip)]
     catbox_popup: Option<usize>,
     replays: Vec<PathBuf>,
 
@@ -63,6 +64,7 @@ pub struct ReplayManager {
 
     #[serde(skip)]
     search_query: String,
+    #[serde(skip)]
     catbox_upload_state: CatboxUploadState,
     #[serde(skip)]
     catbox_upload_recv: mpsc::Receiver<Result<String, String>>,
@@ -155,6 +157,8 @@ impl ReplayManager {
             .thumb_cache
             .retain(|video_path, _thumb_path| video_path.exists());
 
+        repman.thumb_queue = repman.thumb_cache.keys().cloned().collect();
+
         repman
     }
 }
@@ -179,6 +183,8 @@ impl eframe::App for ReplayManager {
             }
             ctx.request_repaint();
         }
+
+        ctx.request_repaint_after(Duration::from_millis(100));
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             egui::MenuBar::new().ui(ui, |ui| {
                 ui.menu_button("File", |ui| {
@@ -451,7 +457,7 @@ impl eframe::App for ReplayManager {
                 DisplayMode::List => 1usize,
             };
 
-            let mut row_reset = 0;
+
             let image_size = match self.display_mode {
                 DisplayMode::Grid => egui::Vec2::new(160.0, 120.0),
                 DisplayMode::List => egui::Vec2::new(80.0, 60.0),
@@ -461,17 +467,36 @@ impl eframe::App for ReplayManager {
             ui.style_mut().visuals.widgets.active.weak_bg_fill = Color32::LIGHT_BLUE;
             ui.style_mut().spacing.item_spacing = egui::Vec2::new(8.0, 8.0);
 
+            let replays_filtered: Vec<(usize, &PathBuf)> = replay_enumerate
+                .filter(|(_, entry)| {
+                    entry
+                        .file_stem()
+                        .map(|s| s.to_string_lossy().to_lowercase().contains(&self.search_query.to_lowercase()))
+                        .unwrap_or(false)
+                })
+                .collect();
+
+            let total_rows = (replays_filtered.len() + column_count - 1).max(1) / column_count;
+            let row_height = image_size.y + 24.0 + grid_spacing.y; // image + label + spacing
+
             egui::ScrollArea::vertical()
                 .max_width(ui.available_width())
-                .show(ui, |ui| {
+                .show_rows(ui, row_height, total_rows, |ui, row_range| {
                     ui.set_width(ui.available_width());
                     egui::Grid::new("Replays")
                         .min_col_width(min_col_width)
                         .min_row_height(min_col_height)
                         .num_columns(column_count)
                         .spacing(grid_spacing)
-                        .show(ui, |ui| -> Result<()> {
-                            for (i, entry) in replay_enumerate {
+                        .show(ui, |ui| {
+                            for row in row_range {
+                                for col in 0..column_count {
+                                    let idx = row * column_count + col;
+                                    let (i, entry) = match replays_filtered.get(idx) {
+                                        Some(e) => e,
+                                        None => break,
+                                    };
+                                    let (i, entry) = (*i, *entry);
                                 if !self.thumb_queue.contains(entry) && !self.thumb_cache.contains_key(entry) {
                                     self.thumb_queue.insert(entry.clone());
 
@@ -542,9 +567,6 @@ impl eframe::App for ReplayManager {
                                     file_stem = std::ffi::OsStr::new("undefined");
                                 }
 
-                                if format!("{}", file_stem.to_string_lossy())
-                                    .to_lowercase()
-                                    .contains(&self.search_query.to_lowercase())
                                 {
                                     let button = match self.display_mode {
                                         DisplayMode::Grid => egui::Button::image(thumbnail_image)
@@ -867,15 +889,10 @@ impl eframe::App for ReplayManager {
                                         );
                                     }*/
 
-                                    row_reset += 1;
                                 }
-
-                                if row_reset == column_count {
-                                    row_reset = 0;
-                                    ui.end_row();
                                 }
+                                ui.end_row();
                             }
-                            Ok(())
                         });
                 });
         });
