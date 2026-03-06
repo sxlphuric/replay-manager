@@ -79,5 +79,5 @@ cargo install --path .
 - [ ] Cross-platform support
   - [x] Linux
   - [x] MacOS
-  - [ ] Windows
+  - [ ] Windows (untested)
 - [ ] Logging with [tracing](https://docs.rs/tracing)
