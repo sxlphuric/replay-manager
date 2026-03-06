@@ -280,7 +280,6 @@ impl eframe::App for ReplayManager {
                     });
                     ui.checkbox(&mut self.show_hidden_files, "Show hidden files");
                 });
-                ui.add_space(16.0);
             });
             if self.settings_popup {
                 let _window = egui::Window::new("Settings")
