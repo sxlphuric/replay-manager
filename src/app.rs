@@ -93,6 +93,8 @@ pub struct ReplayManager {
     thumb_errors: std::collections::HashSet<PathBuf>,
 
     video_editor: String,
+    #[serde(skip)]
+    new_folder: bool,
 }
 
 impl Default for ReplayManager {
@@ -131,6 +133,7 @@ impl Default for ReplayManager {
             thumb_queue: std::collections::HashSet::new(),
             thumb_cache: std::collections::HashMap::new(),
             thumb_errors: std::collections::HashSet::new(),
+            new_folder: true,
         }
     }
 }
@@ -203,18 +206,38 @@ impl eframe::App for ReplayManager {
                 });
                 ui.menu_button("View", |ui| {
                     ui.menu_button("Sort...", |ui| {
-                        ui.radio_value(
-                            &mut self.sort_order,
-                            Sorting::CreationDate,
-                            "Creation Date",
-                        );
-                        ui.radio_value(
-                            &mut self.sort_order,
-                            Sorting::ModificationDate,
-                            "Modification Date",
-                        );
-                        ui.radio_value(&mut self.sort_order, Sorting::Name, "Name");
-                        ui.radio_value(&mut self.sort_order, Sorting::Size, "File Size");
+                        if ui
+                            .radio_value(
+                                &mut self.sort_order,
+                                Sorting::CreationDate,
+                                "Creation Date",
+                            )
+                            .changed()
+                        {
+                            self.new_folder = true
+                        };
+                        if ui
+                            .radio_value(
+                                &mut self.sort_order,
+                                Sorting::ModificationDate,
+                                "Modification Date",
+                            )
+                            .changed()
+                        {
+                            self.new_folder = true;
+                        };
+                        if ui
+                            .radio_value(&mut self.sort_order, Sorting::Name, "Name")
+                            .changed()
+                        {
+                            self.new_folder = true;
+                        };
+                        if ui
+                            .radio_value(&mut self.sort_order, Sorting::Size, "File Size")
+                            .changed()
+                        {
+                            self.new_folder = true;
+                        };
                     });
                     ui.menu_button("Display...", |ui| {
                         ui.radio_value(&mut self.display_mode, DisplayMode::Grid, "Grid");
@@ -223,9 +246,11 @@ impl eframe::App for ReplayManager {
                     ui.menu_button("Order", |ui| {
                         if ui.radio(self.ascending, "Ascending").clicked() {
                             self.ascending = true;
+                            self.new_folder = true;
                         }
                         if ui.radio(!self.ascending, "Descending").clicked() {
                             self.ascending = false;
+                            self.new_folder = true;
                         };
                     })
                 });
@@ -257,17 +282,23 @@ impl eframe::App for ReplayManager {
                             if let Some(path) = self.file_dialog.take_picked() {
                                 self.loading_done = false;
                                 self.replay_folder = Some(path.to_path_buf());
+                                self.new_folder = true;
+                                self.thumb_queue.clear();
                             }
                         });
                         ui.horizontal(|ui| {
                             ui.set_min_width(ui.available_width());
                             ui.label("Replay prefix (default: Replay_):");
-                            ui.text_edit_singleline(&mut self.replay_prefix);
+                            if ui.text_edit_singleline(&mut self.replay_prefix).changed() {
+                                self.new_folder = true;
+                            };
                         });
                         ui.horizontal(|ui| {
                             ui.set_min_width(ui.available_width());
                             ui.label("Replay format (default: mp4):");
-                            ui.text_edit_singleline(&mut self.replay_format);
+                            if ui.text_edit_singleline(&mut self.replay_format).changed() {
+                                self.new_folder = true;
+                            };
                         });
 
                         ui.heading("Catbox");
@@ -355,40 +386,45 @@ impl eframe::App for ReplayManager {
                 ..Default::default()
             };
 
-            let replays_glob = glob_with(&replays_pattern, replays_glob_options);
+            if self.new_folder {
+                let replays_glob = glob_with(&replays_pattern, replays_glob_options);
 
-            if let Ok(replay_paths) = replays_glob {
-                self.replays = replay_paths.filter_map(|e| e.ok()).collect();
-            } else if let Err(err) = replays_glob {
-                self.error = Some(Err(anyhow!(format!("{}", err))));
+                if let Ok(replay_paths) = replays_glob {
+                    self.replays = replay_paths.filter_map(|e| e.ok()).collect();
+                } else if let Err(err) = replays_glob {
+                    self.error = Some(Err(anyhow!(format!("{}", err))));
+                }
+
+                match self.sort_order {
+                    Sorting::CreationDate => self.replays.sort_by(|a, b| {
+                        videoutils::get_creation_date(a)
+                            .into_iter()
+                            .cmp(videoutils::get_creation_date(b))
+                    }),
+                    Sorting::Name => self.replays.sort_by(|a, b| {
+                        videoutils::get_name(a)
+                            .into_iter()
+                            .cmp(&mut videoutils::get_name(b).into_iter())
+                    }),
+                    Sorting::ModificationDate => self.replays.sort_by(|a, b| {
+                        videoutils::get_mod_date(a)
+                            .into_iter()
+                            .cmp(videoutils::get_mod_date(b))
+                    }),
+                    Sorting::Size => self.replays.sort_by(|a, b| {
+                        videoutils::get_size(a)
+                            .into_iter()
+                            .cmp(&mut videoutils::get_size(b).into_iter())
+                    }),
+                }
+
+                if !self.ascending {
+                    self.replays.reverse()
+                }
+
+                self.new_folder = false;
             }
 
-            match self.sort_order {
-                Sorting::CreationDate => self.replays.sort_by(|a, b| {
-                    videoutils::get_creation_date(a)
-                        .into_iter()
-                        .cmp(videoutils::get_creation_date(b))
-                }),
-                Sorting::Name => self.replays.sort_by(|a, b| {
-                    videoutils::get_name(a)
-                        .into_iter()
-                        .cmp(&mut videoutils::get_name(b).into_iter())
-                }),
-                Sorting::ModificationDate => self.replays.sort_by(|a, b| {
-                    videoutils::get_mod_date(a)
-                        .into_iter()
-                        .cmp(videoutils::get_mod_date(b))
-                }),
-                Sorting::Size => self.replays.sort_by(|a, b| {
-                    videoutils::get_size(a)
-                        .into_iter()
-                        .cmp(&mut videoutils::get_size(b).into_iter())
-                }),
-            }
-
-            if !self.ascending {
-                self.replays.reverse()
-            }
 
             if let Ok(result) = self.catbox_upload_recv.try_recv() {
                 self.catbox_upload_state = match result {
@@ -443,8 +479,7 @@ impl eframe::App for ReplayManager {
                                     let folder_display = format!("{}", replay_folder.display());
                                     let tx = self.thumb_send.clone();
 
-                                    std::thread::spawn(move || {
-
+                                    rayon::spawn(move || {
                                         let result = thumbnails::create(
                                             &entry,
                                             &folder_display,
