@@ -26,15 +26,21 @@ Cargo.lock - idk
 Cargo.toml - Cargo dependencies
 ```
 
-## How to install
-I'm assuming you already have Rust installed. If not, please go to https://rustup.rs/.
+## Installation
+I'm assuming you already have Rust installed. If not, please [install it](https://rustup.rs/).
+
+**⚠️ WARNING! The Winget package of LosslessCut is not affiliated or endorsed by the original developers. If you are unsure, you can download LosslessCut from [their github releases](https://github.com/mifi/lossless-cut/releases).**
+
 ```bash
 # Install dependencies
 
 ## Arch Linux
+sudo pacman -S ffmpeg
 yay -S losslesscut
 ## MacOS
 brew install losslesscut ffmpeg
+## Windows
+winget install ch.LosslessCut Gyan.FFmpeg
 
 # Clone the repo
 git clone https://github.com/sxlphuric/replay-manager
