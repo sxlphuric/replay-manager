@@ -59,13 +59,11 @@ cargo install --path .
 - Catbox authentication with user token
 - Litterbox fallback when file too big for catbox
 - Possibly rewrite gpu-screen-recorder in rust :3
-- Fix light mode
 - Add side panel for catbox file send operations
 - Change catbox uploads to allow multiple uploads at the same time
 - Working tests
 - Remove images from like the egui_extras cache (one loaded image is 1.6 mb, and when you have a large folder, it can add up quickly)
 ## Roadmap
-- [ ] Fix light mode
 - [x] Optimize
 - [ ] Polish
 - [x] Keyboard shortcuts
