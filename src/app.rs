@@ -812,23 +812,21 @@ impl eframe::App for ReplayManager {
 
                                                 ui.horizontal(|ui| -> Result<()> {
                                                     if ui.button("Yes").clicked() {
-                                                        let output = Command::new("rm")
-                                                            .arg("-rf")
-                                                            .arg(format!("{}", entry.display()))
-                                                            .output()?;
-                                                        // [TODO] error handling for file stem
-                                                        if output.status.success() {
-                                                        self.toasts
-                                                            .success(format!(
-                                                                "Deleted {}",
-                                                                entry
-                                                                    .file_stem()
-                                                                    .unwrap()
-                                                                    .display()
-                                                            ))
-                                                            .duration(Duration::from_secs(5));
-                                                        } else {
-                                                            return Err(anyhow!("Could not delete file {}", entry.display()));
+                                                        match std::fs::remove_file(entry) {
+                                                            Ok(()) => {
+                                                                self.toasts
+                                                                    .success(format!(
+                                                                        "Deleted {}",
+                                                                        entry
+                                                                            .file_stem()
+                                                                            .unwrap_or_default()
+                                                                            .to_string_lossy()
+                                                                    ))
+                                                                    .duration(Duration::from_secs(5));
+                                                            }
+                                                            Err(e) => {
+                                                                return Err(anyhow!("Could not delete file {}: {}", entry.display(), e));
+                                                            }
                                                         }
                                                         self.delete_popup = None;
                                                     }
