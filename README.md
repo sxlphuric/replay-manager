@@ -63,6 +63,8 @@ cargo install --path .
 - Change catbox uploads to allow multiple uploads at the same time
 - Working tests
 - Remove images from like the egui_extras cache (one loaded image is 1.6 mb, and when you have a large folder, it can add up quickly)
+- Fix Windows catbox uploads failing and litterbox uploads completing but the link returns an empty video
+- Add a keyboard shortcut to refresh replays view
 ## Roadmap
 - [x] Optimize
 - [ ] Polish
@@ -72,5 +74,5 @@ cargo install --path .
 - [x] Cross-platform support
   - [x] Linux
   - [x] MacOS
-  - [x] Windows
+  - [ ] Windows (almost...)
 - [ ] Logging with [tracing](https://docs.rs/tracing)
