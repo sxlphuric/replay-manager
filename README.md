@@ -1,8 +1,10 @@
 # replay-manager
 **⚠️ WARNING! This is not a finished project. Expect bugs and unpolishedness.**
 
+
+## Overview
 This is the Replay Manager.
-It can go in a folder you specify, and will list all the files with a specific file extension. It even creates thumbnails for them with the custom thumbnail script. Furthermore, you can share files to Catbox (litter) and open videos in the Losslesscut video editor.
+It opens the folder you specify, and lists all the files with a specific file extension. It creates it's own thumbnails for them using FFmpeg. Furthermore, you can share files to Catbox or Litterbox, and open videos in a video editor of choice.
 
 <img width="810" height="725" alt="image" src="https://github.com/user-attachments/assets/965d7eb0-e76f-4ca7-a75b-a3e948229db5" />
 
@@ -33,7 +35,7 @@ I'm assuming you already have Rust installed. If not, please [install it](https:
 
 **Notice for Windows users:** The LosslessCut Winget package is unofficial. If you're unsure, you can [use Chocolatey](https://chocolatey.org/install) or grab it from [their github releases](https://github.com/mifi/lossless-cut/releases).
 
-```bash
+```fish
 # Install dependencies
 
 ## Arch Linux
@@ -59,7 +61,7 @@ cargo install --path .
 ## TODO
 - Catbox authentication with user token
 - Litterbox fallback when file too big for catbox
-- Possibly rewrite gpu-screen-recorder in rust :3
+- Possibly rewrite gpu-screen-recorder in rust
 - Add side panel for catbox file send operations
 - Change catbox uploads to allow multiple uploads at the same time
 - Working tests
