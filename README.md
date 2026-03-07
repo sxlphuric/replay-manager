@@ -28,7 +28,8 @@ Cargo.toml - Cargo dependencies
 
 ## Installation
 I'm assuming you already have Rust installed. If not, please [install it](https://rustup.rs/).
-**Notice for MacOS users:** I'm assuming you already have Homebrew installed. If not, please [install it](https://brew.sh)
+
+**Notice for MacOS users:** I'm assuming you already have Homebrew installed. If not, please [install it](https://brew.sh).
 
 **⚠️ WARNING! The Winget package of LosslessCut is not affiliated or endorsed by the original developers. If you are unsure, you can download LosslessCut from [their github releases](https://github.com/mifi/lossless-cut/releases).**
 

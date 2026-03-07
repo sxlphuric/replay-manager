@@ -343,7 +343,10 @@ impl eframe::App for ReplayManager {
                                 self.refresh = true;
                             };
                         });
-                        ui.checkbox(&mut self.find_recursively, "Loop recursively through subfolders");
+                        ui.checkbox(
+                            &mut self.find_recursively,
+                            "Loop recursively through subfolders",
+                        );
 
                         ui.heading("Catbox");
                         ui.checkbox(&mut self.catbox_litter, "Use litterbox");
