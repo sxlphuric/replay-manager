@@ -94,7 +94,7 @@ pub struct ReplayManager {
 
     video_editor: String,
     #[serde(skip)]
-    new_folder: bool,
+    refresh: bool,
 
     show_hidden_files: bool,
 
@@ -145,7 +145,7 @@ impl Default for ReplayManager {
             thumb_queue: std::collections::HashSet::new(),
             thumb_cache: std::collections::HashMap::new(),
             thumb_errors: std::collections::HashSet::new(),
-            new_folder: true,
+            refresh: true,
             show_hidden_files: false,
             settings_shortcut: KeyboardShortcut::new(Modifiers::ALT, Key::S),
             edit_shortcut: KeyboardShortcut::new(Modifiers::SHIFT, Key::E),
@@ -258,7 +258,7 @@ impl eframe::App for ReplayManager {
                             )
                             .changed()
                         {
-                            self.new_folder = true;
+                            self.refresh = true;
                         };
                         if ui
                             .radio_value(
@@ -268,19 +268,19 @@ impl eframe::App for ReplayManager {
                             )
                             .changed()
                         {
-                            self.new_folder = true;
+                            self.refresh = true;
                         };
                         if ui
                             .radio_value(&mut self.sort_order, Sorting::Name, "Name")
                             .changed()
                         {
-                            self.new_folder = true;
+                            self.refresh = true;
                         };
                         if ui
                             .radio_value(&mut self.sort_order, Sorting::Size, "File Size")
                             .changed()
                         {
-                            self.new_folder = true;
+                            self.refresh = true;
                         };
                     });
                     ui.menu_button("Display...", |ui| {
@@ -290,11 +290,11 @@ impl eframe::App for ReplayManager {
                     ui.menu_button("Order", |ui| {
                         if ui.radio(self.ascending, "Ascending").clicked() {
                             self.ascending = true;
-                            self.new_folder = true;
+                            self.refresh = true;
                         }
                         if ui.radio(!self.ascending, "Descending").clicked() {
                             self.ascending = false;
-                            self.new_folder = true;
+                            self.refresh = true;
                         };
                     });
                     ui.checkbox(&mut self.show_hidden_files, "Show hidden files");
@@ -325,7 +325,7 @@ impl eframe::App for ReplayManager {
                             self.file_dialog.update(ctx);
                             if let Some(path) = self.file_dialog.take_picked() {
                                 self.replay_folder = Some(path.to_path_buf());
-                                self.new_folder = true;
+                                self.refresh = true;
                                 self.thumb_queue.clear();
                             }
                         });
@@ -333,14 +333,14 @@ impl eframe::App for ReplayManager {
                             ui.set_min_width(ui.available_width());
                             ui.label("Replay prefix (default: Replay_):");
                             if ui.text_edit_singleline(&mut self.replay_prefix).changed() {
-                                self.new_folder = true;
+                                self.refresh = true;
                             };
                         });
                         ui.horizontal(|ui| {
                             ui.set_min_width(ui.available_width());
                             ui.label("Replay format (default: mp4):");
                             if ui.text_edit_singleline(&mut self.replay_format).changed() {
-                                self.new_folder = true;
+                                self.refresh = true;
                             };
                         });
                         ui.checkbox(&mut self.find_recursively, "Loop recursively through subfolders");
@@ -456,7 +456,7 @@ impl eframe::App for ReplayManager {
                 ..Default::default()
             };
 
-            if self.new_folder {
+            if self.refresh {
                 let replays_glob = glob_with(&replays_pattern, replays_glob_options);
 
                 if let Ok(replay_paths) = replays_glob {
@@ -492,7 +492,7 @@ impl eframe::App for ReplayManager {
                     self.replays.reverse()
                 }
 
-                self.new_folder = false;
+                self.refresh = false;
                 self.loading_done = false;
             }
 
@@ -777,7 +777,7 @@ impl eframe::App for ReplayManager {
                                                 button_response.request_focus();
                                             }
 
-                                            if !self.new_folder && !self.loading_done {
+                                            if !self.refresh && !self.loading_done {
                                                 self.toasts
                                                     .success(format!(
                                                         "Finished loading {} replay{}",
@@ -833,6 +833,7 @@ impl eframe::App for ReplayManager {
                                                                 return Err(anyhow!("Could not delete file {}: {}", entry.display(), e));
                                                             }
                                                         }
+							self.refresh = true;
                                                         self.delete_popup = None;
                                                     }
                                                     if ui.button("No").clicked() {
