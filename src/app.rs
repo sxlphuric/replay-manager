@@ -654,7 +654,7 @@ impl eframe::App for ReplayManager {
                                             if self.display_mode == DisplayMode::Grid {
                                                 ui.add(label);
                                             }
-                                            let entry_path = format!("{}", entry.display());
+                                            let entry_path = entry.to_path_buf();
                                             let editor = self.video_editor.clone();
                                             let catbox_litter = self.catbox_litter;
                                             let litter_delete_time = match self.litterbox_upload_time {
