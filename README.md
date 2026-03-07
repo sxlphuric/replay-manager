@@ -63,7 +63,6 @@ cargo install --path .
 - Add side panel for catbox file send operations
 - Change catbox uploads to allow multiple uploads at the same time
 - Working tests
-- Add option to loop recursively in subfolders to find replays
 - Remove images from like the egui_extras cache (one loaded image is 1.6 mb, and when you have a large folder, it can add up quickly)
 ## Roadmap
 - [ ] Fix light mode

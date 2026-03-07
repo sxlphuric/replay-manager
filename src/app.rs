@@ -106,6 +106,8 @@ pub struct ReplayManager {
     search_shortcut: KeyboardShortcut,
 
     input_state: egui::InputState,
+
+    find_recursively: bool,
 }
 
 impl Default for ReplayManager {
@@ -152,6 +154,7 @@ impl Default for ReplayManager {
             catbox_shortcut: KeyboardShortcut::new(Modifiers::CTRL, Key::S),
             search_shortcut: KeyboardShortcut::new(Modifiers::CTRL, Key::F),
             input_state: egui::InputState::default(),
+            find_recursively: false,
         }
     }
 }
@@ -340,6 +343,7 @@ impl eframe::App for ReplayManager {
                                 self.new_folder = true;
                             };
                         });
+                        ui.checkbox(&mut self.find_recursively, "Loop recursively through subfolders");
 
                         ui.heading("Catbox");
                         ui.checkbox(&mut self.catbox_litter, "Use litterbox");
@@ -439,8 +443,9 @@ impl eframe::App for ReplayManager {
             }
 
             let replays_pattern = format!(
-                "{}/{}*.{}",
+                "{}/{}{}*.{}",
                 replay_folder.to_string_lossy(),
+                if self.find_recursively { "**/" } else { "" },
                 self.replay_prefix,
                 self.replay_format
             );
