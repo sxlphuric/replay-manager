@@ -31,7 +31,7 @@ I'm assuming you already have Rust installed. If not, please [install it](https:
 
 **Notice for MacOS users:** I'm assuming you already have Homebrew installed. If not, please [install it](https://brew.sh).
 
-**⚠️ WARNING! The Winget package of LosslessCut is not affiliated or endorsed by the original developers. If you are unsure, you can download LosslessCut from [their github releases](https://github.com/mifi/lossless-cut/releases).**
+**Notice for Windows users:** The LosslessCut Winget package is unofficial. If you're unsure, you can [use Chocolatey](https://chocolatey.org/install) or grab it from [their github releases](https://github.com/mifi/lossless-cut/releases).
 
 ```bash
 # Install dependencies
