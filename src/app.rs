@@ -4,7 +4,7 @@ use eframe::egui::{self, Color32, Key, KeyboardShortcut, Modifiers};
 use egui_file_dialog::FileDialog;
 use egui_notify::Toasts;
 use glob::{MatchOptions, glob_with};
-use std::{path::PathBuf, process::Command, sync::mpsc, time::Duration};
+use std::{path::PathBuf, sync::mpsc, time::Duration};
 
 #[derive(PartialEq, serde::Deserialize, serde::Serialize)]
 enum Sorting {
