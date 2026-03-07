@@ -746,7 +746,7 @@ impl eframe::App for ReplayManager {
 
 
                                             if button_response.double_clicked() {
-                                                let entry_path = format!("{}", entry.display());
+                                                let entry_path = entry.to_path_buf();
                                                 match self.default_file_action {
                                                     DefaultFileAction::View => {
                                                         std::thread::spawn(move || {
