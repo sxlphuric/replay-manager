@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 anyhow = "1.0.102"
 catbox = "0.8.2"
+dirs = "5.0"
 eframe = { version = "0.33.3", features = ["persistence"] }
 egui-file-dialog = "0.12.0"
 egui-notify = "0.21.0"

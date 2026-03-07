@@ -113,9 +113,9 @@ impl Default for ReplayManager {
         let (catbox_tx, catbox_rx) = mpsc::channel();
         let (thumb_tx, thumb_rx) = mpsc::channel();
         Self {
-            replay_folder: Some(PathBuf::from("/home/aredfx/Videos/Replays")),
+            replay_folder: dirs::video_dir(),
             replay_format: "mp4".to_string(),
-            replay_prefix: "Replay_".to_string(),
+            replay_prefix: "".to_string(),
             delete_popup: None,
             catbox_popup: None,
             replays: vec![],
