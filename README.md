@@ -40,8 +40,10 @@ sudo pacman -S ffmpeg
 yay -S losslesscut
 ## MacOS
 brew install losslesscut ffmpeg
-## Windows
-winget install ch.LosslessCut Gyan.FFmpeg
+## Windows (Winget)
+winget install ch.LosslessCut Gyan.FFmpeg Git.Git
+## Windows (Chocolatey)
+choco install losslesscut ffmpeg git
 
 # Clone the repo
 git clone https://github.com/sxlphuric/replay-manager
