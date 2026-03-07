@@ -688,11 +688,11 @@ impl eframe::App for ReplayManager {
                                                 let catbox_ctx = catbox_ctx.clone();
                                                 std::thread::spawn(move|| {
                                                     let rt = tokio::runtime::Runtime::new().unwrap();
-                                                    let result = rt.block_on(async move {
+                                                    let result: Result<String, Box<dyn std::error::Error>> = rt.block_on(async move {
                                                         if catbox_litter {
-                                                            catbox::litter::upload(&entry_path, litter_delete_time).await
+                                                            catbox::litter::upload(entry_path.to_string_lossy(), litter_delete_time).await
                                                         } else {
-                                                            catbox::file::from_file(&entry_path, None).await
+                                                            catbox::file::from_file(entry_path.to_string_lossy(), None).await
                                                         }
                                                     });
                                                     let _ = catbox_tx.send(result.map_err(|e| e.to_string()));
