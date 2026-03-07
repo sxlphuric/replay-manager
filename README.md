@@ -70,8 +70,8 @@ cargo install --path .
 - [x] Keyboard shortcuts
 - [ ] Catbox authentication
 - [x] Thumbnail generation multithreading
-- [ ] Cross-platform support
+- [x] Cross-platform support
   - [x] Linux
   - [x] MacOS
-  - [ ] Windows (untested)
+  - [x] Windows
 - [ ] Logging with [tracing](https://docs.rs/tracing)
