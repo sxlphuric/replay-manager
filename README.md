@@ -35,7 +35,7 @@ I'm assuming you already have Rust installed. If not, please [install it](https:
 
 **Notice for Windows users:** The LosslessCut Winget package is unofficial. If you're unsure, you can grab it from [their github releases](https://github.com/mifi/lossless-cut/releases) or use [Chocolatey](https://chocolatey.org/install).
 
-```fish
+```bash
 # Install dependencies
 
 ## Arch Linux
