@@ -104,8 +104,7 @@ pub struct ReplayManager {
     delete_shortcut: KeyboardShortcut,
     catbox_shortcut: KeyboardShortcut,
     search_shortcut: KeyboardShortcut,
-
-    input_state: egui::InputState,
+    refresh_shortcut: KeyboardShortcut,
 
     find_recursively: bool,
 }
@@ -153,7 +152,7 @@ impl Default for ReplayManager {
             delete_shortcut: KeyboardShortcut::new(Modifiers::NONE, Key::Delete),
             catbox_shortcut: KeyboardShortcut::new(Modifiers::CTRL, Key::S),
             search_shortcut: KeyboardShortcut::new(Modifiers::CTRL, Key::F),
-            input_state: egui::InputState::default(),
+            refresh_shortcut: KeyboardShortcut::new(Modifiers::CTRL, Key::R),
             find_recursively: false,
         }
     }
@@ -214,6 +213,10 @@ impl eframe::App for ReplayManager {
             self.settings_popup = !self.settings_popup
         }
 
+        if ctx.input_mut(|i| i.consume_shortcut(&self.refresh_shortcut)) {
+            self.refresh = true
+        }
+
         ctx.request_repaint_after(Duration::from_millis(100));
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             egui::MenuBar::new().ui(ui, |ui| {
@@ -249,6 +252,12 @@ impl eframe::App for ReplayManager {
                     });
                 });
                 ui.menu_button("View", |ui| {
+                    if ui.add(egui::Button::new("Refresh").shortcut_text(
+                        self.refresh_shortcut
+                            .format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos"))
+                    ),).clicked() {
+                        self.refresh = true;
+                    };
                     ui.menu_button("Sort...", |ui| {
                         if ui
                             .radio_value(
