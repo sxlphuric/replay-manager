@@ -296,7 +296,7 @@ impl eframe::App for ReplayManager {
                         ui.radio_value(&mut self.display_mode, DisplayMode::Grid, "Grid");
                         ui.radio_value(&mut self.display_mode, DisplayMode::List, "List");
                     });
-                    ui.menu_button("Order", |ui| {
+                    ui.menu_button("Order...", |ui| {
                         if ui.radio(self.ascending, "Ascending").clicked() {
                             self.ascending = true;
                             self.refresh = true;
