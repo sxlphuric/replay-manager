@@ -41,6 +41,9 @@ I'm assuming you already have Rust installed. If not, please [install it](https:
 ## Arch Linux
 sudo pacman -S ffmpeg
 yay -S losslesscut
+## Ubuntu and derivatives
+sudo apt-get install git ffmpeg
+sudo snap install losslesscut
 ## MacOS
 brew install losslesscut ffmpeg
 ## Windows (Winget)
