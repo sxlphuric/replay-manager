@@ -21,7 +21,7 @@ src
 |_ app.rs - the egui app
 |_ main.rs - the main rust code that just launches the egui app
 |_ thumbnails.rs - generates thumbnails
-|_ videoutils - simple functions that return info on a file when given a pathbuf
+|_ videoutils - simple functions that return info on a file when given a path
 README.md - this file
 LICENSE - license (gplv3)
 Cargo.lock - idk
