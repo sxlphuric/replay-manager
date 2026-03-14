@@ -252,10 +252,15 @@ impl eframe::App for ReplayManager {
                     });
                 });
                 ui.menu_button("View", |ui| {
-                    if ui.add(egui::Button::new("Refresh").shortcut_text(
-                        self.refresh_shortcut
-                            .format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos"))
-                    ),).clicked() {
+                    if ui
+                        .add(
+                            egui::Button::new("Refresh").shortcut_text(
+                                self.refresh_shortcut
+                                    .format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos")),
+                            ),
+                        )
+                        .clicked()
+                    {
                         self.refresh = true;
                     };
                     ui.menu_button("Sort...", |ui| {
@@ -352,10 +357,13 @@ impl eframe::App for ReplayManager {
                                 self.refresh = true;
                             };
                         });
-                        if ui.checkbox(
-                            &mut self.find_recursively,
-                            "Loop recursively through subfolders",
-                        ).changed() {
+                        if ui
+                            .checkbox(
+                                &mut self.find_recursively,
+                                "Loop recursively through subfolders",
+                            )
+                            .changed()
+                        {
                             self.refresh = true
                         };
 
