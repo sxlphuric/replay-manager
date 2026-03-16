@@ -1,6 +1,6 @@
 # Replay Manager
 > **⚠️ WARNING:**
-> This is **not** a finished project. Expect **bugs (especially on Windows) and unpolishedness**.
+> This is **not** a finished project. Expect **bugs** (especially on Windows) and **unpolishedness**.
 ## Overview
 This is the Replay Manager.
 It opens the folder you specify, and lists all the files with a specific file extension. It creates it's own thumbnails for them using FFmpeg. Furthermore, you can share files to Catbox or Litterbox, and open videos in a video editor of choice.
