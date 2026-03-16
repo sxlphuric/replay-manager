@@ -28,11 +28,14 @@ Cargo.toml - Cargo dependencies
 ```
 
 ## Installation
-I'm assuming you already have Rust installed. If not, please [install it](https://rustup.rs/).
+> **Note:**
+> I'm assuming you already have Rust installed. If not, please [install it](https://rustup.rs/).
 
-**Notice for MacOS users:** I'm assuming you already have Homebrew installed. If not, please [install it](https://brew.sh).
+> **Note for MacOS users:**
+> I'm assuming you already have Homebrew installed. If not, please [install it](https://brew.sh).
 
-**Notice for Windows users:** The LosslessCut Winget package is unofficial. If you're unsure, you can grab it from [their github releases](https://github.com/mifi/lossless-cut/releases) or use [Chocolatey](https://chocolatey.org/install).
+> **Note for Windows users:**
+> The LosslessCut Winget package is unofficial. If you're unsure, you can grab it from [their github releases](https://github.com/mifi/lossless-cut/releases) or use [Chocolatey](https://chocolatey.org/install).
 
 ```bash
 # Install dependencies
