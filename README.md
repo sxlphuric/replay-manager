@@ -74,9 +74,11 @@ cargo install --path .
 - Fix Windows catbox uploads failing and litterbox uploads completing but the link returns an empty video
 - Add renaming feature
 - Add move feature?
+- Add Saved replays : basically renaming BUT it also moves/clones the replay to a folder called "Saved" or "Favorites" or etc., where it can be easily found or accessed in the program
 ## Roadmap
 - [x] Optimize
 - [ ] Polish
+- [ ] Saved replays
 - [x] Keyboard shortcuts
 - [ ] Catbox authentication
 - [x] Thumbnail generation multithreading
