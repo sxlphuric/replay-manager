@@ -1,4 +1,5 @@
 mod app;
+mod favorites;
 mod thumbnails;
 mod videoutils;
 pub use app::ReplayManager;
