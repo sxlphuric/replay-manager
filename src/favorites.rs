@@ -35,10 +35,12 @@ fn remove(saved_replay_path: &PathBuf) -> Result<&PathBuf> {
 
 fn check_subdirectory(parent_dir: Option<&Path>) -> Result<PathBuf> {
     let path = parent_dir.map_or_else(|| PathBuf::new(), |p| p.to_path_buf());
-    if !path.join(FAVORITES_DIR_NAME).exists() {
-        fs::create_dir_all(path.clone()).expect("Could not create saved replays subdirectory");
+    let favorites_path = path.clone().join(FAVORITES_DIR_NAME);
+    if !favorites_path.exists() {
+        fs::create_dir_all(favorites_path.clone())
+            .expect("Could not create saved replays subdirectory");
     } else {
-        return Ok(path.clone());
+        return Ok(favorites_path.clone());
     }
-    Ok(path.clone())
+    Ok(favorites_path.clone())
 }
