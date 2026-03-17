@@ -75,6 +75,7 @@ cargo install --path .
 - Add renaming feature
 - Add move feature?
 - Add Saved replays : basically renaming BUT it also moves/clones the replay to a folder called "Saved" or "Favorites" or etc., where it can be easily found or accessed in the program
+- Cleaner path management  with glob patterns : instead of using format!, use the .join method
 ## Roadmap
 - [x] Optimize
 - [ ] Polish
