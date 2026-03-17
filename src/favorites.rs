@@ -25,16 +25,12 @@ fn save(replay_path: &PathBuf, replay_name: &str) -> Result<PathBuf> {
 }
 
 #[allow(dead_code)]
-fn remove(replay_path: &PathBuf) -> Result<&PathBuf> {
-    let replay_dir = replay_path.parent();
-    let replay_dir =
-        check_subdirectory(replay_dir).expect("Could not create favorite replays directory");
-    let favorites_dir = replay_dir.join(FAVORITES_DIR_NAME);
-    if let Err(e) = fs::remove_file(favorites_dir.join(replay_path.file_name().unwrap())) {
+fn remove(saved_replay_path: &PathBuf) -> Result<&PathBuf> {
+    if let Err(e) = fs::remove_file(saved_replay_path) {
         return Err(anyhow!("Could not remove replay from favorites: {}", e));
     }
 
-    Ok(replay_path)
+    Ok(saved_replay_path)
 }
 
 fn check_subdirectory(parent_dir: Option<&Path>) -> Result<PathBuf> {
