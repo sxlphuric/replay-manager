@@ -5,14 +5,18 @@ use std::path::{Path, PathBuf};
 const FAVORITES_DIR_NAME: &str = ".favorites";
 
 #[allow(dead_code)]
-fn save(replay_path: &PathBuf) -> Result<PathBuf> {
+fn save(replay_path: &PathBuf, replay_name: &str) -> Result<PathBuf> {
     let replay_dir = replay_path.parent();
     let replay_dir =
         check_subdirectory(replay_dir).expect("Could not create favorite replays directory");
     let favorites_dir = replay_dir.join(FAVORITES_DIR_NAME);
     if let Err(e) = fs::hard_link(
         replay_path,
-        favorites_dir.join(replay_path.file_name().unwrap()),
+        favorites_dir.join(format!(
+            "{}.{}",
+            replay_name,
+            replay_path.extension().unwrap().display()
+        )),
     ) {
         return Err(anyhow!("Could not create favorite replay link: {}", e));
     }
