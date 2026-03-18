@@ -323,6 +323,31 @@ impl eframe::App for ReplayManager {
                     });
                     ui.checkbox(&mut self.show_hidden_files, "Show hidden files");
                 });
+                ui.add_space(8.0);
+                if ui
+                    .small_button(format!(
+                        "{} All",
+                        egui_material_icons::icons::ICON_COLLECTIONS
+                    ))
+                    .clicked()
+                {
+                    if self.favorites_mode {
+                        self.favorites_mode = false;
+                        self.refresh = true;
+                    }
+                }
+                if ui
+                    .small_button(format!(
+                        "{} Favorites",
+                        egui_material_icons::icons::ICON_FAVORITE_BORDER
+                    ))
+                    .clicked()
+                {
+                    if !self.favorites_mode {
+                        self.favorites_mode = true;
+                        self.refresh = true;
+                    }
+                }
             });
             if self.settings_popup {
                 let _window = egui::Window::new("Settings")
