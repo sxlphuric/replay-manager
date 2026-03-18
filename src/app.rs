@@ -4,7 +4,12 @@ use eframe::egui::{self, Color32, Key, KeyboardShortcut, Modifiers};
 use egui_file_dialog::FileDialog;
 use egui_notify::Toasts;
 use glob::{MatchOptions, glob_with};
-use std::{path::PathBuf, sync::mpsc, time::Duration};
+use std::{
+    collections::{HashMap, HashSet},
+    path::PathBuf,
+    sync::mpsc,
+    time::Duration,
+};
 
 #[derive(PartialEq, serde::Deserialize, serde::Serialize)]
 enum Sorting {
@@ -87,10 +92,11 @@ pub struct ReplayManager {
     #[serde(skip)]
     thumb_send: mpsc::Sender<(PathBuf, Result<PathBuf>)>,
     #[serde(skip)]
-    thumb_queue: std::collections::HashSet<PathBuf>,
-    thumb_cache: std::collections::HashMap<PathBuf, PathBuf>,
+    thumb_queue: HashSet<PathBuf>,
+    thumb_cache: HashMap<PathBuf, PathBuf>,
+    favorites_cache: HashMap<PathBuf, PathBuf>,
     #[serde(skip)]
-    thumb_errors: std::collections::HashSet<PathBuf>,
+    thumb_errors: HashSet<PathBuf>,
 
     video_editor: String,
     #[serde(skip)]
@@ -141,9 +147,9 @@ impl Default for ReplayManager {
             default_file_action: DefaultFileAction::View,
             thumb_recv: thumb_rx,
             thumb_send: thumb_tx,
-            thumb_queue: std::collections::HashSet::new(),
-            thumb_cache: std::collections::HashMap::new(),
-            thumb_errors: std::collections::HashSet::new(),
+            thumb_queue: HashSet::new(),
+            thumb_cache: HashMap::new(),
+            thumb_errors: HashSet::new(),
             refresh: true,
             show_hidden_files: false,
             settings_shortcut: KeyboardShortcut::new(Modifiers::ALT, Key::S),
