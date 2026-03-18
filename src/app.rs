@@ -503,7 +503,7 @@ impl eframe::App for ReplayManager {
 
             if self.favorites_mode {
                 replays_pattern = format!(
-                    "{}", favorites::check_subdirectory(self.replay_folder.as_deref()).expect("Could not get path").to_string_lossy()
+                    "{}/*", favorites::check_subdirectory(self.replay_folder.as_deref()).expect("Could not get path").to_string_lossy()
                 );
             } else {
                 replays_pattern = format!(
