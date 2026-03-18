@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 const FAVORITES_DIR_NAME: &str = ".favorites";
 
 #[allow(dead_code)]
-fn save(replay_path: &PathBuf, replay_name: &str) -> Result<PathBuf> {
+pub fn save(replay_path: &PathBuf, replay_name: &str) -> Result<PathBuf> {
     let replay_dir = replay_path.parent();
     let replay_dir =
         check_subdirectory(replay_dir).expect("Could not create favorite replays directory");
@@ -25,7 +25,7 @@ fn save(replay_path: &PathBuf, replay_name: &str) -> Result<PathBuf> {
 }
 
 #[allow(dead_code)]
-fn remove(saved_replay_path: &PathBuf) -> Result<&PathBuf> {
+pub fn remove(saved_replay_path: &PathBuf) -> Result<&PathBuf> {
     if let Err(e) = fs::remove_file(saved_replay_path) {
         return Err(anyhow!("Could not remove replay from favorites: {}", e));
     }
@@ -33,7 +33,7 @@ fn remove(saved_replay_path: &PathBuf) -> Result<&PathBuf> {
     Ok(saved_replay_path)
 }
 
-fn check_subdirectory(parent_dir: Option<&Path>) -> Result<PathBuf> {
+pub fn check_subdirectory(parent_dir: Option<&Path>) -> Result<PathBuf> {
     let path = parent_dir.map_or_else(|| PathBuf::new(), |p| p.to_path_buf());
     let favorites_path = path.clone().join(FAVORITES_DIR_NAME);
     if !favorites_path.exists() {
