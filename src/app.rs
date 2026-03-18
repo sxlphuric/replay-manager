@@ -113,6 +113,7 @@ pub struct ReplayManager {
     refresh_shortcut: KeyboardShortcut,
 
     find_recursively: bool,
+    #[serde(skip)]
     favorites_mode: bool,
 }
 
