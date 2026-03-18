@@ -473,13 +473,21 @@ impl eframe::App for ReplayManager {
                 self.toasts.error("Replay folder does not exists (is None)").duration(Duration::from_secs(5));
             }
 
-            let replays_pattern = format!(
-                "{}/{}{}*.{}",
-                replay_folder.to_string_lossy(),
-                if self.find_recursively { "**/" } else { "" },
-                self.replay_prefix,
-                self.replay_format
-            );
+            let replays_pattern: String;
+
+            if self.favorites_mode {
+                replays_pattern = format!(
+                    "{}", favorites::check_subdirectory(self.replay_folder.as_deref()).expect("Could not get path").to_string_lossy()
+                );
+            } else {
+                replays_pattern = format!(
+                    "{}/{}{}*{}",
+                    replay_folder.to_string_lossy(),
+                    if self.find_recursively { "**/" } else { "" },
+                    self.replay_prefix,
+                    self.replay_format
+                );
+            }
 
             let replays_glob_options = MatchOptions {
 
