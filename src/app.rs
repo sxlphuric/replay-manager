@@ -457,7 +457,7 @@ impl eframe::App for ReplayManager {
             let replay_folder = self.replay_folder.clone().unwrap();
 
             ui.horizontal(|ui| {
-                ui.label(format!("Replays in {}", replay_folder.display()));
+                ui.label(format!("{}eplays in {}", if self.favorites_mode { "Favorite r" } else { "R" }, replay_folder.display()));
             });
 
 
