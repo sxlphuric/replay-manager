@@ -37,7 +37,7 @@ Cargo.toml - Cargo dependencies
 > **Note for Windows users:**
 > The LosslessCut Winget package is unofficial. If you're unsure, you can grab it from [their github releases](https://github.com/mifi/lossless-cut/releases) or use [Chocolatey](https://chocolatey.org/install).
 
-```bash
+```fish
 # Install dependencies
 
 ## Arch Linux
