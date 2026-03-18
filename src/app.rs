@@ -94,7 +94,6 @@ pub struct ReplayManager {
     #[serde(skip)]
     thumb_queue: HashSet<PathBuf>,
     thumb_cache: HashMap<PathBuf, PathBuf>,
-    favorites_cache: HashMap<PathBuf, PathBuf>,
     #[serde(skip)]
     thumb_errors: HashSet<PathBuf>,
 
@@ -162,7 +161,6 @@ impl Default for ReplayManager {
             search_shortcut: KeyboardShortcut::new(Modifiers::CTRL, Key::F),
             refresh_shortcut: KeyboardShortcut::new(Modifiers::CTRL, Key::R),
             find_recursively: false,
-            favorites_cache: HashMap::new(),
             favorites_mode: false,
         }
     }
