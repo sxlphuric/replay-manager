@@ -1,4 +1,4 @@
-use crate::{thumbnails, videoutils};
+use crate::{favorites, thumbnails, videoutils};
 use anyhow::{Result, anyhow};
 use eframe::egui::{self, Color32, Key, KeyboardShortcut, Modifiers};
 use egui_file_dialog::FileDialog;
