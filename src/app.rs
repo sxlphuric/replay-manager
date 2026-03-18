@@ -113,6 +113,7 @@ pub struct ReplayManager {
     refresh_shortcut: KeyboardShortcut,
 
     find_recursively: bool,
+    favorites_mode: bool,
 }
 
 impl Default for ReplayManager {
@@ -160,6 +161,8 @@ impl Default for ReplayManager {
             search_shortcut: KeyboardShortcut::new(Modifiers::CTRL, Key::F),
             refresh_shortcut: KeyboardShortcut::new(Modifiers::CTRL, Key::R),
             find_recursively: false,
+            favorites_cache: HashMap::new(),
+            favorites_mode: false,
         }
     }
 }
