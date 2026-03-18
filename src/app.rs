@@ -358,7 +358,7 @@ impl eframe::App for ReplayManager {
                         ui.horizontal(|ui| {
                             ui.set_min_width(ui.available_width());
                             ui.label(
-                                "Replay videos folder location (default: $HOME/Videos/Replays/):",
+                                "Replay videos folder location (default: Videos):",
                             );
                             /*ui.strong(format!(
                                 "{}",
