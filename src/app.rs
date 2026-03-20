@@ -780,10 +780,12 @@ impl eframe::App for ReplayManager {
                                                 let view_button = egui::Button::new("View").shortcut_text(self.view_shortcut.format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos")));
                                                 let delete_button = egui::Button::new("Delete").shortcut_text(self.delete_shortcut.format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos")));
                                                 let catbox_button = egui::Button::new("Save to Catbox").shortcut_text(self.catbox_shortcut.format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos")));
+                                                let favorite_button = egui::Button::new("Favorite").shortcut_text(self.favorites_shortcut.format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos")));
                                                 let edit_button_response = ui.add(edit_button);
                                                 let view_button_response = ui.add(view_button);
                                                 let delete_button_response = ui.add(delete_button);
                                                 let catbox_button_response = ui.add(catbox_button);
+                                                let favorite_button_response = ui.add(favorite_button);
                                                 if edit_button_response.clicked() {
                                                     open_editor();
                                                     self.toasts.success(format!("Opened {}", self.video_editor)).duration(Duration::from_secs(5));
