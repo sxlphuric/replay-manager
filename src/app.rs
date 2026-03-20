@@ -923,6 +923,63 @@ impl eframe::App for ReplayManager {
                                             },
                                         );
                                     }
+                                    if self.favorites_popup == Some(i) {
+                                        egui::Modal::new(egui::Id::new(i)).show(
+                                            ctx,
+                                            |ui: &mut egui::Ui| {
+                                                ui.set_min_width(310.0);
+
+                                                ui.heading("Favorite video");
+                                                ui.label(format!(
+                                                    "Please enter a favorite name for {}.",
+                                                    entry.display()
+                                                ));
+
+                                                
+                                                ui.horizontal(|ui| {
+                                                    ui.label("Name:");
+                                                    ui.text_edit_singleline(&mut self.favorites_name);
+                                                });
+                                                
+
+                                                ui.horizontal(|ui| -> Result<()> {
+                                                    if ui.button("OK").clicked() {
+                                                        match favorites::save(entry, &self.favorites_name) {
+                                                            Ok(_path) => {
+                                                                self.toasts
+                                                                    .success(format!(
+                                                                        "Favorited {}",
+                                                                        entry
+                                                                            .file_stem()
+                                                                            .unwrap_or_default()
+                                                                            .to_string_lossy()
+                                                                    ))
+                                                                    .duration(Duration::from_secs(5));
+                                                            }
+                                                            Err(e) => {
+                                                                self.toasts.error(format!("Could not favorite file {}", entry.display())).duration(Duration::from_secs(5));
+                                                                self.favorites_popup = None;
+                                                                self.favorites_name = String::new();
+                                                                self.refresh = true;
+                                                                eprintln!("{}", e);
+                                                                return Err(anyhow!("Could not favorite file {}: {}", entry.display(), e));
+                                                            }
+                                                        }
+							
+                                                        self.favorites_popup = None;
+                                                        self.favorites_name = String::new();
+                                                        self.refresh = true;
+                                                    }
+                                                    if ui.button("Cancel").clicked() {
+                                                        self.favorites_popup = None;
+                                                        self.favorites_name = String::new();
+                                                        self.refresh = true;
+                                                    }
+                                                    Ok(())
+                                                })
+                                            },
+                                        );
+                                    }
                                     if self.catbox_popup == Some(i) {
                                         egui::Modal::new(egui::Id::new(i)).show(
                                             ctx,
