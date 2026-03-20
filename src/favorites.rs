@@ -6,6 +6,8 @@ const FAVORITES_DIR_NAME: &str = ".favorites";
 
 #[allow(dead_code)]
 pub fn save(replay_path: &PathBuf, replay_name: &str) -> Result<PathBuf> {
+    // [TODO] Fix (error could not find file or directory)
+    // I'm assuming replay path is fucked up and broken or smth
     let replay_dir = replay_path.parent();
     let replay_dir =
         check_subdirectory(replay_dir).expect("Could not create favorite replays directory");
