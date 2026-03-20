@@ -800,6 +800,10 @@ impl eframe::App for ReplayManager {
                                                     self.catbox_upload_state = CatboxUploadState::Uploading;
                                                     self.catbox_popup = Some(i);
                                                 }
+                                                if favorite_button_response.clicked() {
+                                                    self.favorites_name = format!("{}", entry.file_stem().unwrap().to_string_lossy());
+                                                    self.favorites_popup = Some(i);
+                                                }
                                             });
 
                                             if button_response.has_focus() && ctx.input_mut(|i| i.consume_shortcut(&self.edit_shortcut)) {
@@ -817,6 +821,10 @@ impl eframe::App for ReplayManager {
                                                 upload_catbox();
                                                 self.catbox_upload_state = CatboxUploadState::Uploading;
                                                 self.catbox_popup = Some(i);
+                                            }
+                                            if button_response.has_focus() && ctx.input_mut(|i| i.consume_shortcut(&self.favorites_shortcut)) {
+                                                self.favorites_name = format!("{}", entry.file_stem().unwrap().to_string_lossy());
+                                                self.favorites_popup = Some(i);
                                             }
 
 
