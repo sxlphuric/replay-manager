@@ -110,10 +110,15 @@ pub struct ReplayManager {
     catbox_shortcut: KeyboardShortcut,
     search_shortcut: KeyboardShortcut,
     refresh_shortcut: KeyboardShortcut,
+    favorites_shortcut: KeyboardShortcut,
 
     find_recursively: bool,
     #[serde(skip)]
     favorites_mode: bool,
+    #[serde(skip)]
+    favorites_name: String,
+    #[serde(skip)]
+    favorites_popup: Option<usize>,
 }
 
 impl Default for ReplayManager {
@@ -160,8 +165,11 @@ impl Default for ReplayManager {
             catbox_shortcut: KeyboardShortcut::new(Modifiers::CTRL, Key::S),
             search_shortcut: KeyboardShortcut::new(Modifiers::CTRL, Key::F),
             refresh_shortcut: KeyboardShortcut::new(Modifiers::CTRL, Key::R),
+            favorites_shortcut: KeyboardShortcut::new(Modifiers::SHIFT, Key::S),
             find_recursively: false,
             favorites_mode: false,
+            favorites_name: String::from(""),
+            favorites_popup: None,
         }
     }
 }
