@@ -794,8 +794,11 @@ impl eframe::App for ReplayManager {
                                                     open_view();
                                                     self.toasts.success("Opened media viewer").duration(Duration::from_secs(5));
                                                 }
+                                                if !self.favorites_mode {
+                                                    let delete_button_response = ui.add(delete_button);
                                                 if delete_button_response.clicked() {
                                                     self.delete_popup = Some(i);
+                                                    }
                                                 }
                                                 if catbox_button_response.clicked() {
                                                     upload_catbox();
@@ -803,8 +806,12 @@ impl eframe::App for ReplayManager {
                                                     self.catbox_popup = Some(i);
                                                 }
                                                 if favorite_button_response.clicked() {
+                                                    if self.favorites_mode {
+                                                        self.delete_popup = Some(i)
+                                                    } else {
                                                     self.favorites_name = format!("{}", entry.file_stem().unwrap().to_string_lossy());
                                                     self.favorites_popup = Some(i);
+                                                    }
                                                 }
                                             });
 
