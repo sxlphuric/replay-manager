@@ -72,14 +72,12 @@ cargo install --path .
 - Working tests
 - Remove images from like the egui_extras cache (one loaded image is 1.6 mb, and when you have a large folder, it can add up quickly)
 - Fix Windows catbox uploads failing and litterbox uploads completing but the link returns an empty video
-- Add renaming feature
-- Add move feature?
-- Add Saved replays : basically renaming BUT it also moves/clones the replay to a folder called "Saved" or "Favorites" or etc., where it can be easily found or accessed in the program
+- Add Saved replays : basically renaming BUT it also moves/clones the replay to a folder called "Saved" or "Favorites" or etc., where it can be easily found or accessed in the program (The UX is half baked, make it better)
 - Cleaner path management  with glob patterns : instead of using format!, use the .join method
 ## Roadmap
 - [x] Optimize
 - [ ] Polish
-- [ ] Saved replays
+- [-] Saved replays
 - [x] Keyboard shortcuts
 - [ ] Catbox authentication
 - [x] Thumbnail generation multithreading
