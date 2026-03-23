@@ -21,3 +21,5 @@ jobs:
         run: cargo test --verbose
       - name: Run clippy
         run: cargo clippy --verbose -- -D warnings
+      - name: Format with rustfmt
+        run: cargo fmt --verbose
