@@ -96,6 +96,7 @@ pub struct ReplayManager {
     thumb_cache: HashMap<PathBuf, PathBuf>,
     #[serde(skip)]
     thumb_errors: HashSet<PathBuf>,
+    favorites_cache: HashMap<PathBuf, PathBuf>,
 
     video_editor: String,
     #[serde(skip)]
@@ -170,6 +171,7 @@ impl Default for ReplayManager {
             favorites_mode: false,
             favorites_name: String::from(""),
             favorites_popup: None,
+            favorites_cache: HashMap::new(),
         }
     }
 }
