@@ -2,7 +2,7 @@ use anyhow::{Result, anyhow};
 use std::fs;
 use std::path::{Path, PathBuf};
 
-const FAVORITES_DIR_NAME: &str = ".favorites";
+pub const FAVORITES_DIR_NAME: &str = ".favorites";
 
 #[allow(dead_code)]
 pub fn save(replay_path: &PathBuf, replay_name: &str) -> Result<PathBuf> {
