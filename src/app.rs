@@ -969,7 +969,7 @@ impl eframe::App for ReplayManager {
                                                 ui.horizontal(|ui| -> Result<()> {
                                                     if ui.button("OK").clicked() {
                                                         match favorites::save(entry, &self.favorites_name) {
-                                                            Ok(_path) => {
+                                                            Ok(path) => {
                                                                 self.toasts
                                                                     .success(format!(
                                                                         "Favorited {}",
@@ -979,6 +979,7 @@ impl eframe::App for ReplayManager {
                                                                             .to_string_lossy()
                                                                     ))
                                                                     .duration(Duration::from_secs(5));
+                                                                self.favorites_cache.insert(entry.to_path_buf(),path);
                                                             }
                                                             Err(e) => {
                                                                 self.toasts.error(format!("Could not favorite file {}", entry.display())).duration(Duration::from_secs(5));
