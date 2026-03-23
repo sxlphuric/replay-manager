@@ -9,9 +9,8 @@ pub fn save(replay_path: &PathBuf, replay_name: &str) -> Result<PathBuf> {
     // [TODO] Fix (error could not find file or directory)
     // I'm assuming replay path is fucked up and broken or smth
     let replay_dir = replay_path.parent();
-    let replay_dir =
+    let favorites_dir =
         check_subdirectory(replay_dir).expect("Could not create favorite replays directory");
-    let favorites_dir = replay_dir.join(FAVORITES_DIR_NAME);
     if let Err(e) = fs::hard_link(
         replay_path,
         favorites_dir.join(format!(
