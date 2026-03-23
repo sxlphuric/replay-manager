@@ -785,7 +785,7 @@ impl eframe::App for ReplayManager {
                                                 let favorite_button = egui::Button::new(format!("{}avorite", if self.favorites_mode {"Unf"} else {"F"})).shortcut_text(self.favorites_shortcut.format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos")));
                                                 let edit_button_response = ui.add(edit_button);
                                                 let view_button_response = ui.add(view_button);
-                                                let delete_button_response = ui.add(delete_button);
+                                                
                                                 let catbox_button_response = ui.add(catbox_button);
                                                 let favorite_button_response = ui.add(favorite_button);
                                                 if edit_button_response.clicked() {
