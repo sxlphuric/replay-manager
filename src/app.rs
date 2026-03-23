@@ -332,6 +332,7 @@ impl eframe::App for ReplayManager {
                     ui.checkbox(&mut self.show_hidden_files, "Show hidden files");
                 });
                 ui.add_space(8.0);
+                #[allow(clippy::collapsible_if)]
                 if ui
                     .small_button(format!(
                         "{} All",
@@ -344,6 +345,7 @@ impl eframe::App for ReplayManager {
                         self.refresh = true;
                     }
                 }
+                #[allow(clippy::collapsible_if)]
                 if ui
                     .small_button(format!(
                         "{} Favorites",
@@ -367,9 +369,7 @@ impl eframe::App for ReplayManager {
                         ui.heading("Replay settings");
                         ui.horizontal(|ui| {
                             ui.set_min_width(ui.available_width());
-                            ui.label(
-                                "Replay videos folder location (default: Videos):",
-                            );
+                            ui.label("Replay videos folder location (default: Videos):");
                             /*ui.strong(format!(
                                 "{}",
                                 self.replay_folder
@@ -507,21 +507,19 @@ impl eframe::App for ReplayManager {
                 self.toasts.error("Replay folder does not exists (is None)").duration(Duration::from_secs(5));
             }
 
-            let replays_pattern: String;
-
-            if self.favorites_mode {
-                replays_pattern = format!(
+            let replays_pattern: String = if self.favorites_mode {
+                format!(
                     "{}/*", favorites::check_subdirectory(self.replay_folder.as_deref()).expect("Could not get path").to_string_lossy()
-                );
+                )
             } else {
-                replays_pattern = format!(
+                format!(
                     "{}/{}{}*{}",
                     replay_folder.to_string_lossy(),
                     if self.find_recursively { "**/" } else { "" },
                     self.replay_prefix,
                     self.replay_format
-                );
-            }
+                )
+            };
 
             let replays_glob_options = MatchOptions {
 
@@ -785,7 +783,6 @@ impl eframe::App for ReplayManager {
                                                 let favorite_button = egui::Button::new(format!("{}avorite", if self.favorites_mode {"Unf"} else {"F"})).shortcut_text(self.favorites_shortcut.format(&egui::ModifierNames::NAMES, cfg!(target_os = "macos")));
                                                 let edit_button_response = ui.add(edit_button);
                                                 let view_button_response = ui.add(view_button);
-                                                
                                                 let catbox_button_response = ui.add(catbox_button);
                                                 let favorite_button_response = ui.add(favorite_button);
                                                 if edit_button_response.clicked() {
@@ -798,8 +795,8 @@ impl eframe::App for ReplayManager {
                                                 }
                                                 if !self.favorites_mode {
                                                     let delete_button_response = ui.add(delete_button);
-                                                if delete_button_response.clicked() {
-                                                    self.delete_popup = Some(i);
+                                                    if delete_button_response.clicked() {
+                                                        self.delete_popup = Some(i);
                                                     }
                                                 }
                                                 if catbox_button_response.clicked() {
@@ -837,8 +834,8 @@ impl eframe::App for ReplayManager {
                                                 if self.favorites_mode {
                                                     self.delete_popup = Some(i);
                                                 } else {
-                                                self.favorites_name = format!("{}", entry.file_stem().unwrap().to_string_lossy());
-                                                self.favorites_popup = Some(i);
+                                                    self.favorites_name = format!("{}", entry.file_stem().unwrap().to_string_lossy());
+                                                    self.favorites_popup = Some(i);
                                                 }
                                             }
 
@@ -900,16 +897,16 @@ impl eframe::App for ReplayManager {
                                             |ui: &mut egui::Ui| {
                                                 ui.set_min_width(310.0);
 
-                                                ui.heading(format!("{}", if self.favorites_mode {"Unfavorite"} else {"Delete"}));
+                                                ui.heading(if self.favorites_mode {"Unfavorite"} else {"Delete"});
                                                 ui.label(format!(
                                                     "Are you sure you want to {} {}?",
                                                     if self.favorites_mode {"unfavorite"} else {"delete"},
                                                     entry.display()
                                                 ));
                                                 if !self.favorites_mode {
-                                                ui.strong(
-                                                    "This is permanent and cannot be undone.",
-                                                );
+                                                    ui.strong(
+                                                        "This is permanent and cannot be undone.",
+                                                    );
                                                 }
 
                                                 ui.horizontal(|ui| -> Result<()> {
@@ -961,13 +958,10 @@ impl eframe::App for ReplayManager {
                                                     entry.display()
                                                 ));
 
-                                                
                                                 ui.horizontal(|ui| {
                                                     ui.label("Name:");
                                                     ui.text_edit_singleline(&mut self.favorites_name);
                                                 });
-                                                
-
                                                 ui.horizontal(|ui| -> Result<()> {
                                                     if ui.button("OK").clicked() {
                                                         match favorites::save(entry, &self.favorites_name) {
@@ -992,7 +986,6 @@ impl eframe::App for ReplayManager {
                                                                 return Err(anyhow!("Could not favorite file {}: {}", entry.display(), e));
                                                             }
                                                         }
-							
                                                         self.favorites_popup = None;
                                                         self.favorites_name = String::new();
                                                         self.refresh = true;

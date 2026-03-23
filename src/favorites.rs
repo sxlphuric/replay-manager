@@ -35,7 +35,7 @@ pub fn remove(saved_replay_path: &PathBuf) -> Result<&PathBuf> {
 }
 
 pub fn check_subdirectory(parent_dir: Option<&Path>) -> Result<PathBuf> {
-    let path = parent_dir.map_or_else(|| PathBuf::new(), |p| p.to_path_buf());
+    let path = parent_dir.map_or_else(PathBuf::new, |p| p.to_path_buf());
     let favorites_path = path.clone().join(FAVORITES_DIR_NAME);
     if !favorites_path.exists() {
         fs::create_dir_all(favorites_path.clone())
