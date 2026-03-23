@@ -898,14 +898,17 @@ impl eframe::App for ReplayManager {
                                             |ui: &mut egui::Ui| {
                                                 ui.set_min_width(310.0);
 
-                                                ui.heading("Delete");
+                                                ui.heading(format!("{}", if self.favorites_mode {"Unfavorite"} else {"Delete"}));
                                                 ui.label(format!(
-                                                    "Are you sure you want to delete {}?",
+                                                    "Are you sure you want to {} {}?",
+                                                    if self.favorites_mode {"unfavorite"} else {"delete"},
                                                     entry.display()
                                                 ));
+                                                if !self.favorites_mode {
                                                 ui.strong(
                                                     "This is permanent and cannot be undone.",
                                                 );
+                                                }
 
                                                 ui.horizontal(|ui| -> Result<()> {
                                                     if ui.button("Yes").clicked() {
@@ -913,16 +916,24 @@ impl eframe::App for ReplayManager {
                                                             Ok(()) => {
                                                                 self.toasts
                                                                     .success(format!(
-                                                                        "Deleted {}",
+                                                                        "{} {}{}",
+                                                                        if self.favorites_mode {
+                                                                          "Removed"  
+                                                                        } else {"Deleted"},
                                                                         entry
                                                                             .file_stem()
                                                                             .unwrap_or_default()
-                                                                            .to_string_lossy()
+                                                                            .to_string_lossy(),
+                                                                        if self.favorites_mode {
+                                                                            " from favorites"
+                                                                        } else {
+                                                                            ""
+                                                                        }
                                                                     ))
                                                                     .duration(Duration::from_secs(5));
                                                             }
                                                             Err(e) => {
-                                                                return Err(anyhow!("Could not delete file {}: {}", entry.display(), e));
+                                                                return Err(anyhow!("Could not delete {} {}: {}", if self.favorites_mode {"hard link"} else {"file"}, entry.display(), e));
                                                             }
                                                         }
 							self.refresh = true;
