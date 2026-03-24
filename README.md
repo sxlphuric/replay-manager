@@ -29,6 +29,7 @@ The Replay Manager is an opinionated video browser built using **Rust** and **eg
 - 🎞 **Automatic Thumbnail Generation** - The application autonomatically generates thumbnails using FFmpeg
 - 💾 **Cloud Save** - Upload your files to Catbox or Litterbox for easy sharing
 - 📈 **Video Edit** - Open replays in an editor of choice (default losslesscut)
+- ⭐ **Favorites** - Favorite replays to find them easily
 
 ## Screenshots
 
