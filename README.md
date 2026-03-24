@@ -8,7 +8,7 @@
 
 *Built with Rust and egui for high performance*
 
-![Last Commit](https://img.shields.io/github/last-commit/sxlphuric/replay-manager?style=flat)
+![Version](https://img.shields.io/badge/version-0.1.0-blue)
 ![Commit Activity](https://img.shields.io/github/commit-activity/m/sxlphuric/replay-manager?style=flat)
 ![CI](https://img.shields.io/github/actions/workflow/status/sxlphuric/replay-manager/rust.yml?label=CI&style=flat)
 ![Stars](https://img.shields.io/github/stars/sxlphuric/replay-manager?style=flat)
