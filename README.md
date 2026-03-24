@@ -8,8 +8,10 @@
 
 *Built with Rust and egui for high performance*
 
-![Stars](https://img.shields.io/github/stars/sxlphuric/replay-manager)
 ![Last Commit](https://img.shields.io/github/last-commit/sxlphuric/replay-manager)
+![Commit Activity](https://img.shields.io/github/commit-activity/m/sxlphuric/replay-manager)
+![CI](https://img.shields.io/github/actions/workflow/status/sxlphuric/replay-manager/rust.yml?label=CI)
+![Stars](https://img.shields.io/github/stars/sxlphuric/replay-manager)
 
 [Installation](#Building) · [Roadmap](#Roadmap) · [Structure](#Structure)
 
@@ -45,7 +47,11 @@ The Replay Manager is an opinionated video browser built using **Rust** and **eg
 
 ## Building
 
+
 This is currently the only way to install the Replay Manager.
+
+#### Support
+[![Linux](https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=black)](#) [![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=F0F0F0)](#) [![Windows](https://custom-icon-badges.demolab.com/badge/Windows-0078D6?logo=windows11&logoColor=white)](#) (partial)
 
 ### 1. Install dependencies
 
