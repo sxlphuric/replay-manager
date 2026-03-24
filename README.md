@@ -22,7 +22,7 @@
 > **⚠️ WARNING:**
 > This is **not** a finished project. Expect **bugs** (especially on Windows) and **unpolishedness**.
 
-The Replay Manager is an opinionated video browser built using **Rust** and **egui**.
+The Replay Manager is an opinionated video browser built using **Rust** and **egui**. It's goal is to *somewhat* replicate **Medal**'s features (excluding the social part)
 
 ### Key Features
 
