@@ -11,7 +11,7 @@
 ![Stars](https://img.shields.io/github/stars/sxlphuric/replay-manager)
 ![Last Commit](https://img.shields.io/github/last-commit/sxlphuric/replay-manager)
 
-[Installation](#Installation) · [Roadmap](#Roadmap) · [Structure](#Structure)
+[Installation](#Building) · [Roadmap](#Roadmap) · [Structure](#Structure)
 
 </div>
 
@@ -37,41 +37,60 @@ The Replay Manager is an opinionated video browser built using **Rust** and **eg
   <img width="810" height="725" alt="image" src="https://github.com/user-attachments/assets/965d7eb0-e76f-4ca7-a75b-a3e948229db5" />
 </div>
 
-## Installation
+## Dependencies
+
+- [FFmpeg](https://git.ffmpeg.org/ffmpeg/)
+- [Rust](https://rustup.rs/) 1.94.0
+- [LosslessCut](https://github.com/mifi/lossless-cut/) **(optional)**
+
+## Building
+
+This is currently the only way to install the Replay Manager.
+
+### 1. Install dependencies
+
+Install all the dependencies listed above.
+
+On **Windows**:
 > **Note:**
-> I'm assuming you already have Rust installed. If not, please [install it](https://rustup.rs/).
-
-> **Note for MacOS users:**
-> I'm assuming you already have Homebrew installed. If not, please [install it](https://brew.sh).
-
-> **Note for Windows users:**
 > The LosslessCut Winget package is unofficial. If you're unsure, you can grab it from [their github releases](https://github.com/mifi/lossless-cut/releases) or use [Chocolatey](https://chocolatey.org/install).
 
+`winget install ch.LosslessCut Gyan.FFmpeg`
+
+*or*
+
+`choco install losslesscut ffmpeg git`
+
+if you prefer [Chocolatey](https://chocolatey.org/install).
+
+
+On **MacOS**:
+> **Note:**
+> I'm assuming you already have Homebrew installed. If not, please [install it](https://brew.sh).
+
+`brew install losslesscut ffmpeg`
+
+On **Arch Linux and derivatives**: Use `yay` or your preferred AUR helper to install LosslessCut (package `losslesscut`)
+
+On **Ubuntu and derivatives**: Use `snap` to install LosslessCut (package `losslesscut`)
+
+### 2. Cloning the repository
+
+Clone the repository to your local machine. This can be done with
+
 ```fish
-# Install dependencies
+# Clone the repository
+git clone https://github.com/sxlphuric/replay-manager.git
 
-## Arch Linux
-sudo pacman -S ffmpeg
-yay -S losslesscut
-## Ubuntu and derivatives
-sudo apt-get install git ffmpeg
-sudo snap install losslesscut
-## MacOS
-brew install losslesscut ffmpeg
-## Windows (Winget)
-winget install ch.LosslessCut Gyan.FFmpeg Git.Git
-## Windows (Chocolatey)
-choco install losslesscut ffmpeg git
-
-# Clone the repo
-git clone https://github.com/sxlphuric/replay-manager
-
-# Go into the folder
+# Go into the repository's folder
 cd replay-manager
-
-# Install with cargo
-cargo install --path .
 ```
+
+### 3. Building
+
+Build and install the package with `cargo`:
+
+`cargo install --path .`
 
 ## Structure
 ```
