@@ -78,11 +78,13 @@ On **MacOS**:
 
 `brew install losslesscut ffmpeg`
 
-On **Linux**: Use your package manager to install `ffmpeg` and `git`.
+On **Linux**:
 
-On **Arch Linux and derivatives**: Use `yay` or your preferred AUR helper to install LosslessCut (package `losslesscut`)
+Use your package manager to install `ffmpeg` and `git`.
 
-On **other distros**: Use [**snap**](https://snapcraft.io) to install LosslessCut (package `losslesscut`)
+- On **Arch Linux and derivatives**: Use `yay` or your preferred AUR helper to install LosslessCut (package `losslesscut`)
+
+- On **other distros**: Use [**snap**](https://snapcraft.io) to install LosslessCut (package `losslesscut`)
 
 ### 2. Cloning the repository
 
