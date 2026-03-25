@@ -129,7 +129,8 @@ Cargo.toml - Cargo dependencies
 ## Roadmap
 - [x] Optimize
 - [ ] Polish
-- [ ] Saved replays
+- [x] Saved replays
+  - [ ] Better UX
 - [x] Keyboard shortcuts
 - [ ] Catbox authentication
 - [x] Thumbnail generation multithreading
