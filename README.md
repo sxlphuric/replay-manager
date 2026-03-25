@@ -56,12 +56,13 @@ This is currently the only way to install the Replay Manager.
 ### 1. Install dependencies
 
 Install all the dependencies listed above.
+These commands will also install `git` on your machine.
 
 On **Windows**:
 > **Note:**
 > The LosslessCut Winget package is unofficial. If you're unsure, you can grab it from [their github releases](https://github.com/mifi/lossless-cut/releases) or use [Chocolatey](https://chocolatey.org/install).
 
-`winget install ch.LosslessCut Gyan.FFmpeg`
+`winget install ch.LosslessCut Gyan.FFmpeg Git.Git`
 
 *or*
 
@@ -74,11 +75,14 @@ On **MacOS**:
 > **Note:**
 > I'm assuming you already have Homebrew installed. If not, please [install it](https://brew.sh).
 
+
 `brew install losslesscut ffmpeg`
+
+On **Linux**: Use your package manager to install `ffmpeg` and `git`.
 
 On **Arch Linux and derivatives**: Use `yay` or your preferred AUR helper to install LosslessCut (package `losslesscut`)
 
-On **Ubuntu and derivatives**: Use `snap` to install LosslessCut (package `losslesscut`)
+On **other distros**: Use [**snap**](https://snapcraft.io) to install LosslessCut (package `losslesscut`)
 
 ### 2. Cloning the repository
 
