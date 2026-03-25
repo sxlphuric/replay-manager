@@ -21,10 +21,7 @@
 
 ## Overview
 
-> **⚠️ WARNING:**
-> This is **not** a finished project. Expect **bugs** (especially on Windows) and **unpolishedness**.
-
-The Replay Manager is an opinionated video browser built using **Rust** and **egui**. It's goal is to *somewhat* replicate **Medal**'s features (excluding the social part)
+The Replay Manager is an opinionated video browser built using **Rust** and **egui**. It's goal is to *somewhat* replicate **Medal**'s features (excluding the social media part)
 
 ### Key Features
 
@@ -48,7 +45,6 @@ The Replay Manager is an opinionated video browser built using **Rust** and **eg
 - [LosslessCut](https://github.com/mifi/lossless-cut/) **(optional)**
 
 ## Building
-
 
 This is currently the only way to install the Replay Manager.
 
