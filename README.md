@@ -13,7 +13,7 @@
 ![CI](https://img.shields.io/github/actions/workflow/status/sxlphuric/replay-manager/rust.yml?label=CI&style=flat)
 ![Stars](https://img.shields.io/github/stars/sxlphuric/replay-manager?style=flat)
 
-[Installation](#Building) · [Roadmap](#Roadmap) · [Structure](#Structure)
+[Installation](#Building) • [Roadmap](#Roadmap) • [Structure](#Structure)
 
 </div>
 
