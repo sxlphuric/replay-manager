@@ -39,6 +39,8 @@ The Replay Manager is an opinionated video browser built using **Rust** and **eg
   <img width="810" height="725" alt="image" src="https://github.com/user-attachments/assets/965d7eb0-e76f-4ca7-a75b-a3e948229db5" />
 </div>
 
+---
+
 ## Dependencies
 
 - [FFmpeg](https://git.ffmpeg.org/ffmpeg/)
