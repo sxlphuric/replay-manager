@@ -44,7 +44,7 @@ The Replay Manager is an opinionated video browser built using **Rust** and **eg
 ## Dependencies
 
 - [FFmpeg](https://git.ffmpeg.org/ffmpeg/)
-- [Rust](https://rustup.rs/) 1.94.0
+- [Rust](https://rustup.rs/) 1.94.0 or later
 - [LosslessCut](https://github.com/mifi/lossless-cut/) **(optional)**
 
 ## Building
@@ -129,7 +129,7 @@ Cargo.toml - Cargo dependencies
 ## Roadmap
 - [x] Optimize
 - [ ] Polish
-- [-] Saved replays
+- [ ] Saved replays
 - [x] Keyboard shortcuts
 - [ ] Catbox authentication
 - [x] Thumbnail generation multithreading
