@@ -30,7 +30,7 @@ pub fn create(
 
     let ffmpeg_cmd = find_ffmpeg()?;
 
-    let thumbnail_image_size = eframe::egui::Vec2::new(640.0, 360.0);
+    let thumbnail_image_size = eframe::egui::Vec2::new(160.0, 120.0);
 
     let output = Command::new(ffmpeg_cmd)
         .arg("-hwaccel")
