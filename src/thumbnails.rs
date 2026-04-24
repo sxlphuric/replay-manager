@@ -30,6 +30,8 @@ pub fn create(
 
     let ffmpeg_cmd = find_ffmpeg()?;
 
+    let thumbnail_image_size = eframe::egui::Vec2::new(640.0, 360.0);
+
     let output = Command::new(ffmpeg_cmd)
         .arg("-hwaccel")
         .arg("auto")
@@ -44,7 +46,10 @@ pub fn create(
         .arg("-pix_fmt")
         .arg("yuv420p")
         .arg("-vf")
-        .arg("scale=640:360")
+        .arg(format!(
+            "scale={}:{}",
+            thumbnail_image_size.x, thumbnail_image_size.y
+        ))
         .arg("-f")
         .arg("image2")
         .arg("-q:v")
