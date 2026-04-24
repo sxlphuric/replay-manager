@@ -189,9 +189,14 @@ impl ReplayManager {
         repman
             .thumb_cache
             .retain(|_video_path, thumb_path| thumb_path.exists());
-        repman
-            .thumb_cache
-            .retain(|video_path, _thumb_path| video_path.exists());
+        repman.thumb_cache.retain(|video_path, thumb_path| {
+            if video_path.exists() {
+                true
+            } else {
+                let _ = std::fs::remove_file(thumb_path);
+                false
+            }
+        });
 
         repman.thumb_queue = repman.thumb_cache.keys().cloned().collect();
 
