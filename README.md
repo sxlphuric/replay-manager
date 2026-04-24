@@ -13,7 +13,7 @@
 ![CI](https://img.shields.io/github/actions/workflow/status/sxlphuric/replay-manager/rust.yml?label=CI&style=flat)
 ![Stars](https://img.shields.io/github/stars/sxlphuric/replay-manager?style=flat)
 
-[Installation](#Building) · [Roadmap](#Roadmap) · [Structure](#Structure)
+[Installation](#Building) • [Roadmap](#Roadmap) • [Structure](#Structure)
 
 </div>
 
@@ -21,14 +21,11 @@
 
 ## Overview
 
-> **⚠️ WARNING:**
-> This is **not** a finished project. Expect **bugs** (especially on Windows) and **unpolishedness**.
-
-The Replay Manager is an opinionated video browser built using **Rust** and **egui**. It's goal is to *somewhat* replicate **Medal**'s features (excluding the social part)
+The Replay Manager is an opinionated video browser built using **Rust** and **egui**. It's goal is to *somewhat* replicate **Medal**'s features (excluding the social media part)
 
 ### Key Features
 
-- 🎞 **Automatic Thumbnail Generation** - The application autonomatically generates thumbnails using FFmpeg
+- 🎞 **Automatic Thumbnail Generation** - Works cross-platform using FFmpeg
 - 💾 **Cloud Save** - Upload your files to Catbox or Litterbox for easy sharing
 - 📈 **Video Edit** - Open replays in an editor of choice (default losslesscut)
 - ⭐ **Favorites** - Favorite replays to find them easily
@@ -39,14 +36,15 @@ The Replay Manager is an opinionated video browser built using **Rust** and **eg
   <img width="810" height="725" alt="image" src="https://github.com/user-attachments/assets/965d7eb0-e76f-4ca7-a75b-a3e948229db5" />
 </div>
 
+---
+
 ## Dependencies
 
 - [FFmpeg](https://git.ffmpeg.org/ffmpeg/)
-- [Rust](https://rustup.rs/) 1.94.0
+- [Rust](https://rustup.rs/) 1.94.0 or later
 - [LosslessCut](https://github.com/mifi/lossless-cut/) **(optional)**
 
 ## Building
-
 
 This is currently the only way to install the Replay Manager.
 
@@ -56,12 +54,13 @@ This is currently the only way to install the Replay Manager.
 ### 1. Install dependencies
 
 Install all the dependencies listed above.
+These commands will also install `git` on your machine.
 
 On **Windows**:
 > **Note:**
 > The LosslessCut Winget package is unofficial. If you're unsure, you can grab it from [their github releases](https://github.com/mifi/lossless-cut/releases) or use [Chocolatey](https://chocolatey.org/install).
 
-`winget install ch.LosslessCut Gyan.FFmpeg`
+`winget install ch.LosslessCut Gyan.FFmpeg Git.Git`
 
 *or*
 
@@ -74,11 +73,16 @@ On **MacOS**:
 > **Note:**
 > I'm assuming you already have Homebrew installed. If not, please [install it](https://brew.sh).
 
+
 `brew install losslesscut ffmpeg`
 
-On **Arch Linux and derivatives**: Use `yay` or your preferred AUR helper to install LosslessCut (package `losslesscut`)
+On **Linux**:
 
-On **Ubuntu and derivatives**: Use `snap` to install LosslessCut (package `losslesscut`)
+Use your package manager to install `ffmpeg` and `git`.
+
+- On **Arch Linux and derivatives**: Use `yay` or your preferred AUR helper to install LosslessCut (package `losslesscut`)
+
+- On **other distros**: Use [**snap**](https://snapcraft.io) to install LosslessCut (package `losslesscut`)
 
 ### 2. Cloning the repository
 
@@ -121,7 +125,8 @@ Cargo.toml - Cargo dependencies
 ## Roadmap
 - [x] Optimize
 - [ ] Polish
-- [-] Saved replays
+- [x] Saved replays
+  - [ ] Better UX
 - [x] Keyboard shortcuts
 - [ ] Catbox authentication
 - [x] Thumbnail generation multithreading
