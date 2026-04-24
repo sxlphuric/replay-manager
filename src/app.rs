@@ -517,7 +517,7 @@ impl eframe::App for ReplayManager {
                 if self.find_recursively { let _ = path.join("**/"); }
 
                 path
-                    .join(&format!("{}*.{}",self.replay_prefix, self.replay_format))
+                    .join(format!("{}*.{}",self.replay_prefix, self.replay_format))
             };
 
             let replays_glob_options = MatchOptions {
