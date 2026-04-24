@@ -917,7 +917,7 @@ impl eframe::App for ReplayManager {
                                                                     .success(format!(
                                                                         "{} {}{}",
                                                                         if self.favorites_mode {
-                                                                          "Removed"  
+                                                                          "Removed"
                                                                         } else {"Deleted"},
                                                                         entry
                                                                             .file_stem()
