@@ -6,7 +6,7 @@ use egui_notify::Toasts;
 use glob::{MatchOptions, glob_with};
 use std::{
     collections::{HashMap, HashSet},
-    path::PathBuf,
+    path::{Path, PathBuf},
     sync::mpsc,
     time::Duration,
 };
@@ -507,18 +507,17 @@ impl eframe::App for ReplayManager {
                 self.toasts.error("Replay folder does not exists (is None)").duration(Duration::from_secs(5));
             }
 
-            let replays_pattern: String = if self.favorites_mode {
-                format!(
-                    "{}/*", favorites::check_subdirectory(self.replay_folder.as_deref()).expect("Could not get path").to_string_lossy()
-                )
+            let replays_pattern: PathBuf = if self.favorites_mode {
+                Path::new(&format!("{}", favorites::check_subdirectory(self.replay_folder.as_deref()).expect("Could not get path").to_string_lossy()))
+                    .join("*")
             } else {
-                format!(
-                    "{}/{}{}*{}",
-                    replay_folder.to_string_lossy(),
-                    if self.find_recursively { "**/" } else { "" },
-                    self.replay_prefix,
-                    self.replay_format
-                )
+                let path =
+                    Path::new(replay_folder.to_str().unwrap());
+
+                if self.find_recursively { let _ = path.join("**/"); }
+
+                path
+                    .join(&format!("{}*.{}",self.replay_prefix, self.replay_format))
             };
 
             let replays_glob_options = MatchOptions {
@@ -528,7 +527,8 @@ impl eframe::App for ReplayManager {
             };
 
             if self.refresh {
-                let replays_glob = glob_with(&replays_pattern, replays_glob_options);
+                let replays_glob = glob_with(&replays_pattern.to_string_lossy(), replays_glob_options);
+
 
                 if let Ok(replay_paths) = replays_glob {
                     self.replays = replay_paths.filter_map(|e| e.ok()).collect();
