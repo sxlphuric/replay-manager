@@ -468,6 +468,19 @@ impl eframe::App for ReplayManager {
                                     "Edit",
                                 );
                             });
+                        ui.separator();
+                        if ui.button("Delete thumbnails").clicked() {
+                            self.thumb_cache = HashMap::new();
+                            self.thumb_errors = HashSet::new();
+                            let _ = std::fs::remove_dir_all(
+                                self.replay_folder.clone().unwrap().join(".thumbnails"),
+                            );
+                        }
+                        if ui.button("Delete cache").clicked() {
+                            for thumb in self.thumb_cache.values() {
+                                ctx.forget_image(&format!("file://{}", thumb.display()))
+                            }
+                        }
                     });
             };
         });
