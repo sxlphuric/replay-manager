@@ -96,6 +96,8 @@ pub struct ReplayManager {
     thumb_cache: HashMap<PathBuf, PathBuf>,
     #[serde(skip)]
     thumb_errors: HashSet<PathBuf>,
+    #[serde(skip)]
+    thumb_threads: rayon::ThreadPool,
     favorites_cache: HashMap<PathBuf, PathBuf>,
 
     video_editor: String,
@@ -172,6 +174,11 @@ impl Default for ReplayManager {
             favorites_name: String::from(""),
             favorites_popup: None,
             favorites_cache: HashMap::new(),
+            thumb_threads: rayon::ThreadPoolBuilder::new()
+                .num_threads(4)
+                .thread_name(|i| format!("thumbnail-worker-{}", i))
+                .build()
+                .unwrap(),
         }
     }
 }
@@ -645,7 +652,7 @@ impl eframe::App for ReplayManager {
                                     let folder_display = format!("{}", replay_folder.display());
                                     let tx = self.thumb_send.clone();
 
-                                    rayon::spawn(move || {
+                                    self.thumb_threads.spawn(move || {
                                         let result = thumbnails::create(
                                             &entry,
                                             &folder_display,
