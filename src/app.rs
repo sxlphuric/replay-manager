@@ -343,7 +343,7 @@ impl eframe::App for ReplayManager {
                     });
                     ui.checkbox(&mut self.show_hidden_files, "Show hidden files");
                 });
-                ui.add_space(8.0);
+                ui.separator();
                 #[allow(clippy::collapsible_if)]
                 if ui
                     .small_button(format!(
