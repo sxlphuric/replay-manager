@@ -146,3 +146,4 @@ Cargo.toml - Cargo dependencies
 - Fix Windows catbox uploads failing and litterbox uploads completing but the link returns an empty video
 - Add Saved replays : basically renaming BUT it also moves/clones the replay to a folder called "Saved" or "Favorites" or etc., where it can be easily found or accessed in the program (The UX is half baked, make it better)
 - Cleaner path management  with glob patterns : instead of using format!, use the .join method
+- What does the nix nix nix nix nix nix nix nix nix (flake + nix instructions)
